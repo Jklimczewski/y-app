@@ -4,26 +4,34 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const User = require("../models/User");
 
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+};
+
 // Rejerstracja nowego użytkownika
 router.post("/register", async (req, res) => {
   try {
-    const { login, email, password } = req.body;
+    const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const doc = {
-      login,
+      username,
       email,
       password: hashedPassword,
-      registrationDate: Date.now(),
+      name: "",
+      surname: "",
+      phoneNumber: "",
     };
-    if (login == "admin") doc.admin = true;
     const ifExist = await User.findOne({ email: email });
     if (ifExist) {
-      res.sendStatus(409);
+      res.status(200).send("Email is already taken!");
     } else {
       const ifCreated = await User.create(doc);
-      ifCreated
-        ? res.status(201).json({ redirect: "/client/login" })
-        : res.sendStatus(500);
+      console.log(ifCreated);
+      ifCreated ? res.status(201).send("User created!") : res.sendStatus(500);
     }
   } catch (e) {
     res.status(503).json(e);
@@ -31,13 +39,9 @@ router.post("/register", async (req, res) => {
 });
 
 // Login użytkownika
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    successRedirect: "/client",
-    failureRedirect: "/client/login",
-  })
-);
+router.post("/login", passport.authenticate("local"), (req, res) => {
+  res.status(200).json({ user: req.user });
+});
 
 // Logout użytkownika
 router.post("/logout", function (req, res, next) {
@@ -45,8 +49,34 @@ router.post("/logout", function (req, res, next) {
     if (err) {
       return next(err);
     }
-    res.redirect("/client/login");
+    res.sendStatus(200);
   });
+});
+
+// Pobranie danych zalogowanego użytkownika
+router.get("/profile", isAuthenticated, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
+
+// Zmiana danych zalogowanego użytkownika
+router.post("/profile", isAuthenticated, async (req, res) => {
+  try {
+    const { name, surname, phoneNumber } = req.body;
+    const updated = {};
+    if (name != req.user.name) {
+      updated.name = name;
+    }
+    if (surname != req.user.surname) {
+      updated.surname = surname;
+    }
+    if (phoneNumber != req.user.phoneNumber) {
+      updated.phoneNumber = phoneNumber;
+    }
+    const ifEdited = await User.updateOne({ _id: req.user.id }, updated);
+    ifEdited ? res.status(200).send("Edited") : res.sendStatus(500);
+  } catch (e) {
+    res.status(503).json(e);
+  }
 });
 
 // Pobranie danych wszystkich użytkowników
@@ -62,10 +92,10 @@ router.get("/", async (req, res) => {
 // Utworzenie nowego użytkownika przez administratora
 router.post("/", async (req, res) => {
   try {
-    const { login, email, password } = req.body;
+    const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const doc = {
-      login,
+      username,
       email,
       password: hashedPassword,
       registrationDate: Date.now(),
