@@ -22,21 +22,15 @@ export default {
   getData() {
     return apiClient.get("/users/profile");
   },
+  fetchData(userId) {
+    return apiClient.get("/users/" + userId);
+  },
   changeData(name, surname, phoneNumber) {
-    return apiClient.post("/users/profile", { name, surname, phoneNumber });
+    return apiClient.put("/users/profile", { name, surname, phoneNumber });
   },
   getPersons(pageSize, pageNo) {
     return apiClient.get(
       "/persons" + "/?_limit=" + pageSize + "&_page=" + pageNo
     );
-  },
-  getPerson(id) {
-    return apiClient.get("/persons/" + id);
-  },
-  addPerson(name, address, age, email) {
-    return apiClient.post("/persons", { name, address, age, email });
-  },
-  editPerson(id, name, address, age, email) {
-    return apiClient.put("/persons/" + id, { name, address, age, email });
   },
 };

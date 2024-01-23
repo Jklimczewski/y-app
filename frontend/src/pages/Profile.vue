@@ -5,10 +5,18 @@
         Witaj, {{ store.getUser }} !
       </h1>
       <div class="flex flex-col md:flex-row">
-        <img
-          src="https://www.picturethisai.com/wiki-image/1080/201221807685107712.jpeg"
-          class="card-body w-60 h-60 mt-5 md:mt-20 md:mr-10 rounded-full"
-        />
+        <div>
+          <img
+            src="https://www.picturethisai.com/wiki-image/1080/201221807685107712.jpeg"
+            class="card-body w-60 h-60 mt-5 ml-14 md:ml-10 md:mt-20 md:mr-10 rounded-full"
+          />
+          <button
+            class="btn w-80 mr-6 md:mr-0 ml-6 md:ml-0 md:mt-10 text-primary"
+            @click="showCard"
+          >
+            Podgląd wizytówki
+          </button>
+        </div>
         <form @submit.prevent="onSubmit" class="card-body pt-0 md:pt-10">
           <div class="form-control">
             <label for="name" class="label">
@@ -19,7 +27,6 @@
               type="text"
               id="name"
               class="input input-bordered"
-              required
             />
           </div>
           <div class="form-control">
@@ -31,7 +38,6 @@
               type="text"
               id="surname"
               class="input input-bordered"
-              required
             />
           </div>
           <div class="form-control">
@@ -44,7 +50,6 @@
               pattern="[0-9]{9}"
               id="phoneNumber"
               class="input input-bordered"
-              required
             />
           </div>
           <div class="form-control">
@@ -59,6 +64,11 @@
               type="file"
               accept="image/png, image/jpeg, image/jpg"
             />
+          </div>
+          <div class="form-control h-3 text-lg">
+            <div v-if="successMessage" class="text-green-500">
+              {{ successMessage }}
+            </div>
           </div>
           <div class="form-control mt-6">
             <button type="submit" class="btn btn-primary">Zapisz</button>
@@ -77,6 +87,8 @@ export default {
   name: "Profile",
   data() {
     return {
+      successMessage: "",
+      userId: "",
       name: "",
       surname: "",
       phoneNumber: "",
@@ -88,11 +100,22 @@ export default {
   },
   methods: {
     onSubmit() {
-      DataService.changeData(this.name, this.surname, this.phoneNumber);
+      DataService.changeData(this.name, this.surname, this.phoneNumber).then(
+        (res) => {
+          this.successMessage = res.data;
+          setTimeout(() => {
+            this.successMessage = "";
+          }, 2000);
+        }
+      );
+    },
+    showCard() {
+      this.$router.push({ name: "Card", params: { userId: this.userId } });
     },
   },
   beforeMount() {
     DataService.getData().then((res) => {
+      this.userId = res.data.user._id;
       this.name = res.data.user.name;
       this.surname = res.data.user.surname;
       this.phoneNumber = res.data.user.phoneNumber;

@@ -55,7 +55,7 @@
         </div>
       </form>
       <div class="text-md font-thin text-center">
-        <a href="/login" class="">Masz już konto ?</a>
+        <router-link to="/login" class="">Masz już konto ?</router-link>
       </div>
     </div>
   </div>

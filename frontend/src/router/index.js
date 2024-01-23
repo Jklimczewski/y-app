@@ -5,6 +5,12 @@ import { useUserStore } from "../stores/userStore";
 const routes = [
   { path: "/", component: Home },
   {
+    path: "/card/:userId",
+    name: "Card",
+    component: () => import("../pages/Card.vue"),
+    props: true,
+  },
+  {
     path: "/login",
     component: () => import("../pages/Login.vue"),
     beforeEnter: () => {

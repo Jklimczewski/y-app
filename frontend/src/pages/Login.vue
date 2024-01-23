@@ -39,7 +39,7 @@
         </div>
       </form>
       <div class="text-md font-thin text-center">
-        <a href="/register" class="">Nie masz konta ?</a>
+        <router-link to="/register" class="">Nie masz konta ?</router-link>
       </div>
     </div>
   </div>
