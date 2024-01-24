@@ -1,16 +1,18 @@
 <template>
   <div class="navbar bg-base-100">
     <div class="navbar-start">
-      <div class="">
+      <router-link to="/">
         <img
           class="w-20 h-15"
           alt="Tailwind CSS Navbar component"
           src="https://as2.ftcdn.net/v2/jpg/03/03/63/79/1000_F_303637956_NiN7cI2MJCu591X1ovNsPizgF64Vggpt.jpg"
         />
-      </div>
+      </router-link>
     </div>
     <div class="navbar-center">
-      <a href="/" class="btn btn-ghost text-xl">Serwis Y</a>
+      <router-link to="/posts" class="btn btn-ghost text-xl">
+        Serwis Y
+      </router-link>
     </div>
     <div class="navbar-end">
       <div v-if="username != ''" class="dropdown dropdown-end">
@@ -25,10 +27,14 @@
           class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li v-if="username == ''">
-            <a href="/login" class="justify-between">Login</a>
+            <router-link href="/login" class="justify-between">
+              Login
+            </router-link>
           </li>
           <li v-else>
-            <a href="/profile" class="justify-between">Profile</a>
+            <router-link to="/profile" class="justify-between">
+              Profile
+            </router-link>
             <button type="button" @click="logout">Logout</button>
           </li>
         </ul>

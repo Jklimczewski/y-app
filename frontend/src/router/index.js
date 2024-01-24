@@ -5,12 +5,6 @@ import { useUserStore } from "../stores/userStore";
 const routes = [
   { path: "/", component: Home },
   {
-    path: "/card/:userId",
-    name: "Card",
-    component: () => import("../pages/Card.vue"),
-    props: true,
-  },
-  {
     path: "/login",
     component: () => import("../pages/Login.vue"),
     beforeEnter: () => {
@@ -33,6 +27,20 @@ const routes = [
       const store = useUserStore();
       if (store.getUser == "") return "/login";
     },
+  },
+  {
+    path: "/posts",
+    component: () => import("../pages/Posts.vue"),
+    beforeEnter: () => {
+      const store = useUserStore();
+      if (store.getUser == "") return "/login";
+    },
+  },
+  {
+    path: "/card/:userId",
+    name: "Card",
+    component: () => import("../pages/Card.vue"),
+    props: true,
   },
 ];
 

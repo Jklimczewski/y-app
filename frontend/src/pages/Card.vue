@@ -21,19 +21,24 @@
           </span>
         </div>
       </div>
-      <div
-        v-if="loggedUserId && loggedUserId != userId"
-        class="flex flex-col items-center"
-      >
-        <button v-if="followed == true" @click="unfollow" class="btn">
-          <v-icon name="co-user-unfollow" scale="1.5" />
-          Unfollow
+      <div class="flex flex-row justify-center">
+        <button @click="showPosts = !showPosts" class="btn">
+          Posty użytkownika
         </button>
-        <button v-else @click="follow" class="btn">
-          <v-icon name="co-user-follow" scale="1.5" />
-          Follow
-        </button>
+        <div v-if="loggedUserId && loggedUserId != userId" class="pl-10">
+          <button v-if="followed == true" @click="unfollow" class="btn">
+            <v-icon name="co-user-unfollow" scale="1.5" />
+            Unfollow
+          </button>
+          <button v-else @click="follow" class="btn">
+            <v-icon name="co-user-follow" scale="1.5" />
+            Follow
+          </button>
+        </div>
       </div>
+    </div>
+    <div v-if="showPosts" class="card w-full max-w-3xl items-center pt-10">
+      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Posty</h1>
     </div>
   </div>
 </template>
@@ -48,6 +53,7 @@ export default {
   data() {
     return {
       userData: {},
+      showPosts: false,
       followed: false,
     };
   },
