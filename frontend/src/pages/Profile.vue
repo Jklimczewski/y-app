@@ -7,7 +7,13 @@
       <div class="flex flex-col md:flex-row">
         <div>
           <img
-            src="https://www.picturethisai.com/wiki-image/1080/201221807685107712.jpeg"
+            v-if="savedPicture"
+            :src="savedPicture"
+            class="card-body w-60 h-60 mt-5 ml-14 md:ml-10 md:mt-20 md:mr-10 rounded-full"
+          />
+          <img
+            v-else
+            src="../assets/avatar.jpg"
             class="card-body w-60 h-60 mt-5 ml-14 md:ml-10 md:mt-20 md:mr-10 rounded-full"
           />
           <button
@@ -57,7 +63,7 @@
               <span class="label-text">Zmień zdjęcie</span>
             </label>
             <input
-              v-on:change="test"
+              v-on:change="changeFile"
               className="file-input file-input-bordered w-full"
               aria-describedby="user_avatar_help"
               id="profilePicture"
@@ -92,6 +98,8 @@ export default {
       name: "",
       surname: "",
       phoneNumber: "",
+      profilePicture: null,
+      savedPicture: "",
     };
   },
   setup() {
@@ -100,17 +108,25 @@ export default {
   },
   methods: {
     onSubmit() {
-      DataService.changeData(this.name, this.surname, this.phoneNumber).then(
-        (res) => {
-          this.successMessage = res.data;
-          setTimeout(() => {
-            this.successMessage = "";
-          }, 2000);
-        }
-      );
+      const formData = new FormData();
+      formData.append("name", this.name);
+      formData.append("surname", this.surname);
+      formData.append("phoneNumber", this.phoneNumber);
+      formData.append("avatar", this.profilePicture);
+      DataService.changeData(formData).then((res) => {
+        this.successMessage = res.data;
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      });
     },
     showCard() {
       this.$router.push({ name: "Card", params: { userId: this.userId } });
+    },
+    changeFile(event) {
+      if (event.currentTarget.files) {
+        this.profilePicture = event.target.files[0];
+      }
     },
   },
   beforeMount() {
@@ -119,6 +135,7 @@ export default {
       this.name = res.data.user.name;
       this.surname = res.data.user.surname;
       this.phoneNumber = res.data.user.phoneNumber;
+      this.savedPicture = res.data.user.profilePicture;
     });
   },
 };

@@ -19,14 +19,24 @@ export default {
   logout() {
     return apiClient.post("users/logout");
   },
-  getData() {
-    return apiClient.get("/users/profile");
-  },
   fetchData(userId) {
     return apiClient.get("/users/" + userId);
   },
-  changeData(name, surname, phoneNumber) {
-    return apiClient.put("/users/profile", { name, surname, phoneNumber });
+  getData() {
+    return apiClient.get("/users/profile");
+  },
+  changeData(formData) {
+    return apiClient.put("/users/profile", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+  addFollow(userId) {
+    return apiClient.put("/users/profile/add-follow", { userId });
+  },
+  deleteFollow(userId) {
+    return apiClient.put("/users/profile/delete-follow", { userId });
   },
   getPersons(pageSize, pageNo) {
     return apiClient.get(

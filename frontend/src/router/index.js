@@ -15,7 +15,7 @@ const routes = [
     component: () => import("../pages/Login.vue"),
     beforeEnter: () => {
       const store = useUserStore();
-      if (store.username != "") return "/profile";
+      if (store.getUser != "") return "/profile";
     },
   },
   {
@@ -23,7 +23,7 @@ const routes = [
     component: () => import("../pages/Register.vue"),
     beforeEnter: () => {
       const store = useUserStore();
-      if (store.username != "") return "/profile";
+      if (store.getUser != "") return "/profile";
     },
   },
   {
@@ -31,7 +31,7 @@ const routes = [
     component: () => import("../pages/Profile.vue"),
     beforeEnter: () => {
       const store = useUserStore();
-      if (store.username == "") return "/login";
+      if (store.getUser == "") return "/login";
     },
   },
 ];

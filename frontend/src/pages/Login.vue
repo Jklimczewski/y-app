@@ -67,7 +67,11 @@ export default {
       DataService.login(this.email, this.password)
         .then((response) => {
           if (response.status == 200) {
-            this.store.saveUser(response.data.user.username);
+            this.store.saveUser(
+              response.data.user._id,
+              response.data.user.username,
+              response.data.user.follows
+            );
             this.$router.push("/profile");
           }
         })

@@ -16,10 +16,8 @@
       <div v-if="username != ''" class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
-            <img
-              alt="Tailwind CSS Navbar component"
-              src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-            />
+            <img v-if="profilePicture" :src="profilePicture" />
+            <img v-else src="../assets/avatar.jpg" />
           </div>
         </div>
         <ul
@@ -45,6 +43,11 @@ import DataService from "../services/DataService";
 
 export default {
   name: "Navbar",
+  data() {
+    return {
+      profilePicture: "",
+    };
+  },
   setup() {
     const store = useUserStore();
     return { store };
@@ -54,15 +57,32 @@ export default {
       return this.store.getUser;
     },
   },
+  watch: {
+    username(val) {
+      if (val != "") {
+        DataService.getData().then((res) => {
+          this.profilePicture = res.data.user.profilePicture;
+        });
+      }
+    },
+  },
   methods: {
     logout() {
       DataService.logout().then((response) => {
         if (response.status == 200) {
           this.store.deleteUser();
           this.$router.push("/login");
+          location.reload();
         }
       });
     },
+  },
+  created() {
+    if (this.store.getUser) {
+      DataService.getData().then((res) => {
+        this.profilePicture = res.data.user.profilePicture;
+      });
+    }
   },
 };
 </script>

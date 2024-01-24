@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const multer = require("multer");
+const upload = multer();
 const User = require("../models/User");
+const { imagekit } = require("../imageKit-config");
 
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -10,6 +13,26 @@ const isAuthenticated = (req, res, next) => {
   } else {
     return res.status(401).json({ message: "Unauthorized" });
   }
+};
+
+const saveProfilePicture = (pic) => {
+  return new Promise((resolve, reject) => {
+    imagekit.upload(
+      {
+        file: pic.buffer, //required
+        fileName: pic.originalname, //required
+        useUniqueFileName: false,
+      },
+      function (error, result) {
+        if (error) {
+          console.log(error);
+          reject(error);
+        } else {
+          resolve(result.url);
+        }
+      }
+    );
+  });
 };
 
 // Rejerstracja nowego użytkownika
@@ -24,6 +47,8 @@ router.post("/register", async (req, res) => {
       name: "",
       surname: "",
       phoneNumber: "",
+      profilePicture: "",
+      follows: [],
     };
     const ifExist = await User.findOne({ email: email });
     if (ifExist) {
@@ -59,20 +84,58 @@ router.get("/profile", isAuthenticated, (req, res) => {
 });
 
 // Zmiana danych zalogowanego użytkownika
-router.put("/profile", isAuthenticated, async (req, res) => {
+router.put(
+  "/profile",
+  isAuthenticated,
+  upload.single("avatar"),
+  async (req, res) => {
+    try {
+      const { name, surname, phoneNumber } = req.body;
+      const updated = {};
+      if (req.file) {
+        updated.profilePicture = await saveProfilePicture(req.file);
+      }
+      if (name != req.user.name) {
+        updated.name = name;
+      }
+      if (surname != req.user.surname) {
+        updated.surname = surname;
+      }
+      if (phoneNumber != req.user.phoneNumber) {
+        updated.phoneNumber = phoneNumber;
+      }
+      const ifEdited = await User.updateOne({ _id: req.user.id }, updated);
+      ifEdited ? res.status(200).send("Saved new values") : res.sendStatus(500);
+    } catch (e) {
+      res.status(503).json(e);
+    }
+  }
+);
+
+// Dodanie nowe obserwowanego userId zalogowanego użytkownika
+router.put("/profile/add-follow", isAuthenticated, async (req, res) => {
   try {
-    const { name, surname, phoneNumber } = req.body;
-    const updated = {};
-    if (name != req.user.name) {
-      updated.name = name;
-    }
-    if (surname != req.user.surname) {
-      updated.surname = surname;
-    }
-    if (phoneNumber != req.user.phoneNumber) {
-      updated.phoneNumber = phoneNumber;
-    }
-    const ifEdited = await User.updateOne({ _id: req.user.id }, updated);
+    const { userId } = req.body;
+    const ifEdited = await User.findByIdAndUpdate(
+      req.user.id,
+      { $addToSet: { follows: userId } },
+      { new: true }
+    );
+    ifEdited ? res.status(200).send("Saved new values") : res.sendStatus(500);
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Usunięcię obserwowanego userId zalogowanego użytkownika
+router.put("/profile/delete-follow", isAuthenticated, async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const ifEdited = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { follows: userId } },
+      { new: true }
+    );
     ifEdited ? res.status(200).send("Saved new values") : res.sendStatus(500);
   } catch (e) {
     res.status(503).json(e);
@@ -87,6 +150,9 @@ router.get("/:userId", async (req, res) => {
     toDisplay.username = user.username;
     if (user.name != "") {
       toDisplay.name = user.name;
+    }
+    if (user.profilePicture != "") {
+      toDisplay.profilePicture = user.profilePicture;
     }
     if (user.surname != "") {
       toDisplay.surname = user.surname;
