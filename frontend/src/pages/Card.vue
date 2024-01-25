@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center pt-8">
-    <div class="rounded-xl shadow-xl bg-base-100">
+    <div class="rounded-xl shadow-xl bg-base-200">
       <div class="flex flex-col sm:flex-row p-10 items-center">
         <img
           v-if="userData.profilePicture"
@@ -21,16 +21,16 @@
           </span>
         </div>
       </div>
-      <div class="flex flex-row justify-center">
-        <button @click="showPosts = !showPosts" class="btn">
-          Posty użytkownika
+      <div class="flex flex-row justify-center pb-5">
+        <button @click="toggleShowPosts" class="btn btn-neutral">
+          {{ showPosts ? "Schowaj posty" : "Pokaż posty" }}
         </button>
         <div v-if="loggedUserId && loggedUserId != userId" class="pl-10">
-          <button v-if="followed == true" @click="unfollow" class="btn">
+          <button v-if="followed == true" @click="unfollow" class="btn-neutral">
             <v-icon name="co-user-unfollow" scale="1.5" />
             Unfollow
           </button>
-          <button v-else @click="follow" class="btn">
+          <button v-else @click="follow" class="btn btn-neutral">
             <v-icon name="co-user-follow" scale="1.5" />
             Follow
           </button>
@@ -38,21 +38,32 @@
       </div>
     </div>
     <div v-if="showPosts" class="card w-full max-w-3xl items-center pt-10">
-      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Posty</h1>
+      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">
+        Posty użytkownika
+      </h1>
+      <div v-for="post in userPosts" :key="post._id">
+        <!-- Render post data as needed -->
+        <PostComp :content="post.content" :username="post.author" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import PostComp from "../components/PostComp.vue";
 import DataService from "../services/DataService";
 import { useUserStore } from "../stores/userStore";
 
 export default {
   name: "Card",
+  components: {
+    PostComp,
+  },
   props: ["userId"],
   data() {
     return {
       userData: {},
+      userPosts: [],
       showPosts: false,
       followed: false,
     };
@@ -87,6 +98,21 @@ export default {
         this.store.deleteToFollow(this.userId);
         this.followed = false;
       });
+    },
+    toggleShowPosts() {
+      this.showPosts = !this.showPosts;
+      if (this.showPosts) {
+        this.fetchUserPosts();
+      }
+    },
+    fetchUserPosts() {
+      DataService.fetchPosts(this.userId)
+        .then((res) => {
+          this.userPosts = res.data.userPosts;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };

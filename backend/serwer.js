@@ -29,6 +29,8 @@ const initializePassport = require("./passport-config");
 initializePassport(passport);
 
 const users = require("./routes/users");
+const posts = require("./routes/posts");
+app.use("/posts", posts);
 app.use("/users", users);
 
 mongoose

@@ -38,6 +38,14 @@ export default {
   deleteFollow(userId) {
     return apiClient.put("/users/profile/delete-follow", { userId });
   },
+
+  addPost(postContent) {
+    return apiClient.post("/posts/addPost", { postContent });
+  },
+  fetchPosts(userId) {
+    return apiClient.get("/posts/" + userId);
+  },
+
   getPersons(pageSize, pageNo) {
     return apiClient.get(
       "/persons" + "/?_limit=" + pageSize + "&_page=" + pageNo

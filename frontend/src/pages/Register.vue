@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center pt-10">
-    <div class="card w-full max-w-sm shadow-2xl bg-base-100">
+    <div class="card w-full max-w-sm shadow-2xl bg-base-200">
       <h1 class="pt-10 self-center text-3xl font-bold text-center">
         Zarejerstruj się!
       </h1>

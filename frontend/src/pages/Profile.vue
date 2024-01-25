@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center pt-8">
-    <div class="card w-full max-w-4xl items-center shadow-xl bg-base-100">
+    <div class="card w-full max-w-4xl items-center shadow-xl bg-base-200">
       <h1 class="text-5xl font-semibold pt-5 items-center">
         Witaj, {{ store.getUser }} !
       </h1>
@@ -113,12 +113,19 @@ export default {
       formData.append("surname", this.surname);
       formData.append("phoneNumber", this.phoneNumber);
       formData.append("avatar", this.profilePicture);
-      DataService.changeData(formData).then((res) => {
-        this.successMessage = res.data;
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
-      });
+      DataService.changeData(formData)
+        .then((res) => {
+          this.successMessage = res.data;
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
+        })
+        .catch((err) => {
+          if (err.response.status == 401) {
+            this.store.deleteUser();
+            location.reload();
+          }
+        });
     },
     showCard() {
       this.$router.push({ name: "Card", params: { userId: this.userId } });
@@ -130,13 +137,20 @@ export default {
     },
   },
   beforeMount() {
-    DataService.getData().then((res) => {
-      this.userId = res.data.user._id;
-      this.name = res.data.user.name;
-      this.surname = res.data.user.surname;
-      this.phoneNumber = res.data.user.phoneNumber;
-      this.savedPicture = res.data.user.profilePicture;
-    });
+    DataService.getData()
+      .then((res) => {
+        this.userId = res.data.user._id;
+        this.name = res.data.user.name;
+        this.surname = res.data.user.surname;
+        this.phoneNumber = res.data.user.phoneNumber;
+        this.savedPicture = res.data.user.profilePicture;
+      })
+      .catch((err) => {
+        if (err.response.status == 401) {
+          this.store.deleteUser();
+          location.reload();
+        }
+      });
   },
 };
 </script>

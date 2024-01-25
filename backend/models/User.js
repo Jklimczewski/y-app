@@ -13,6 +13,7 @@ const userSchema = new Schema({
       type: Schema.Types.ObjectId,
     },
   ],
+  lastPostsRefresh: Date,
 });
 
 module.exports = model("User", userSchema);
