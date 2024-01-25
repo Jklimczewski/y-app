@@ -32,6 +32,9 @@ export default {
       },
     });
   },
+  postsRefreshed() {
+    return apiClient.put("/users/profile/posts-refresh");
+  },
   addFollow(userId) {
     return apiClient.put("/users/profile/add-follow", { userId });
   },
@@ -44,6 +47,9 @@ export default {
   },
   fetchPosts(userId) {
     return apiClient.get("/posts/" + userId);
+  },
+  getPosts() {
+    return apiClient.get("/posts/follows");
   },
 
   getPersons(pageSize, pageNo) {

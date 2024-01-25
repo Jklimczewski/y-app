@@ -21,12 +21,16 @@
           </span>
         </div>
       </div>
-      <div class="flex flex-row justify-center pb-5">
+      <div v-if="loggedUserId" class="flex flex-row justify-center pb-5">
         <button @click="toggleShowPosts" class="btn btn-neutral">
           {{ showPosts ? "Schowaj posty" : "Pokaż posty" }}
         </button>
-        <div v-if="loggedUserId && loggedUserId != userId" class="pl-10">
-          <button v-if="followed == true" @click="unfollow" class="btn-neutral">
+        <div v-if="loggedUserId != userId" class="pl-10">
+          <button
+            v-if="followed == true"
+            @click="unfollow"
+            class="btn btn-neutral"
+          >
             <v-icon name="co-user-unfollow" scale="1.5" />
             Unfollow
           </button>
@@ -43,7 +47,11 @@
       </h1>
       <div v-for="post in userPosts" :key="post._id">
         <!-- Render post data as needed -->
-        <PostComp :content="post.content" :username="post.author" />
+        <PostComp
+          :content="post.content"
+          :username="post.author"
+          :date="post.createdAt"
+        />
       </div>
     </div>
   </div>

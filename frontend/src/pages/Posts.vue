@@ -13,6 +13,7 @@
               class="textarea textarea-bordered textarea-lg w-96"
               placeholder="Wpisz treść"
               id="postContent"
+              required
             ></textarea>
             <div class="flex justify-end mt-6">
               <button type="submit" class="btn btn-primary">Dodaj post</button>
@@ -24,7 +25,18 @@
     <div class="card w-full max-w-3xl items-center pt-10">
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe posty</h1>
       <div v-for="(post, index) in addedPosts" :key="index">
-        <PostComp :content="post.content" :username="post.author" />
+        <PostComp
+          :content="post.content"
+          :username="post.author"
+          :date="post.createdAt"
+        />
+      </div>
+      <div v-for="(post, index) in fetchedPosts" :key="index">
+        <PostComp
+          :content="post.content"
+          :username="post.author"
+          :date="post.createdAt"
+        />
       </div>
     </div>
   </div>
@@ -44,6 +56,7 @@ export default {
     return {
       postContent: "",
       addedPosts: [],
+      fetchedPosts: [],
     };
   },
   setup() {
@@ -58,18 +71,26 @@ export default {
           this.postContent = "";
         })
         .catch((err) => {
-          if (err.response.status == 401) {
+          if (err.response.status && err.response.status == 401) {
             this.store.deleteUser();
+            location.reload();
           }
         });
     },
   },
-  // beforeMount() {
-  //   DataService.getData().then((res) => {
-  //     this.userId = res.data.user._id;
-  //     this.savedPicture = res.data.user.profilePicture;
-  //   });
-  // },
+  mounted() {
+    DataService.getPosts()
+      .then((res) => {
+        this.fetchedPosts = res.data.posts;
+        DataService.postsRefreshed();
+      })
+      .catch((err) => {
+        if (err.response.status && err.response.status == 401) {
+          this.store.deleteUser();
+          location.reload();
+        }
+      });
+  },
 };
 </script>
 

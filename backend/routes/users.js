@@ -49,13 +49,13 @@ router.post("/register", async (req, res) => {
       phoneNumber: "",
       profilePicture: "",
       follows: [],
+      lastPostsRefresh: null,
     };
     const ifExist = await User.findOne({ email: email });
     if (ifExist) {
       res.status(200).send("Email is already taken!");
     } else {
       const ifCreated = await User.create(doc);
-      console.log(ifCreated);
       ifCreated ? res.status(201).send("User created!") : res.sendStatus(500);
     }
   } catch (e) {
@@ -111,6 +111,20 @@ router.put(
     }
   }
 );
+
+// Zmiana lastPostsRefresh zalogowanego użytkownika
+router.put("/profile/posts-refresh", isAuthenticated, async (req, res) => {
+  try {
+    const date = new Date();
+    const ifEdited = await User.updateOne(
+      { _id: req.user.id },
+      { lastPostsRefresh: date }
+    );
+    ifEdited ? res.status(200).send("Saved new values") : res.sendStatus(500);
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
 
 // Dodanie nowe obserwowanego userId zalogowanego użytkownika
 router.put("/profile/add-follow", isAuthenticated, async (req, res) => {

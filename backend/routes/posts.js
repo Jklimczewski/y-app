@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const Post = require("../models/Post");
 
 const isAuthenticated = (req, res, next) => {
@@ -18,7 +17,6 @@ router.post("/addPost", isAuthenticated, async (req, res) => {
     const doc = {
       content: postContent,
       author: req.user.id,
-      creationDate: Date.now(),
       parentPost: null,
       quotedPost: null,
     };
@@ -31,7 +29,44 @@ router.post("/addPost", isAuthenticated, async (req, res) => {
   }
 });
 
-// Pobranie postów o autorze = userId
+// Pobranie postów obserwowanych osób z ostatnich 24h
+router.get("/follows", isAuthenticated, async (req, res) => {
+  try {
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
+
+    const postsFromFollowedUsers = await Post.find({
+      author: { $in: req.user.follows },
+      createdAt: { $gte: twentyFourHoursAgo },
+    });
+    postsFromFollowedUsers
+      ? res.status(200).json({ posts: postsFromFollowedUsers })
+      : res.sendStatus(500);
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Pobranie postów obserwowanych osób z ostatnich 24h, których nie widzieliśmy
+router.get("/follows/new", isAuthenticated, async (req, res) => {
+  try {
+    const lastRefresh = req.user.lastPostsRefresh;
+
+    const postsFromFollowedUsers = await Post.find({
+      author: { $in: req.user.follows },
+      createdAt: {
+        $gte: lastRefresh,
+      },
+    });
+    postsFromFollowedUsers
+      ? res.status(200).json({ posts: postsFromFollowedUsers })
+      : res.sendStatus(500);
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Pobranie postów usera
 router.get("/:userId", async (req, res) => {
   try {
     const userPosts = await Post.find({ author: req.params.userId });
@@ -40,4 +75,5 @@ router.get("/:userId", async (req, res) => {
     res.status(503).json(e);
   }
 });
+
 module.exports = router;

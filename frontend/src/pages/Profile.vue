@@ -121,7 +121,7 @@ export default {
           }, 2000);
         })
         .catch((err) => {
-          if (err.response.status == 401) {
+          if (err.response.status && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }
@@ -146,7 +146,7 @@ export default {
         this.savedPicture = res.data.user.profilePicture;
       })
       .catch((err) => {
-        if (err.response.status == 401) {
+        if (err.response.status && err.response.status == 401) {
           this.store.deleteUser();
           location.reload();
         }
@@ -155,4 +155,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

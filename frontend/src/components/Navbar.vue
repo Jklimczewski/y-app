@@ -77,7 +77,6 @@ export default {
       DataService.logout().then((response) => {
         if (response.status == 200) {
           this.store.deleteUser();
-          this.$router.push("/login");
           location.reload();
         }
       });
@@ -85,9 +84,16 @@ export default {
   },
   created() {
     if (this.store.getUser) {
-      DataService.getData().then((res) => {
-        this.profilePicture = res.data.user.profilePicture;
-      });
+      DataService.getData()
+        .then((res) => {
+          this.profilePicture = res.data.user.profilePicture;
+        })
+        .catch((err) => {
+          if (err.response.status && err.response.status == 401) {
+            this.store.deleteUser();
+            location.reload();
+          }
+        });
     }
   },
 };
