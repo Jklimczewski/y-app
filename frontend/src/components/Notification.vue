@@ -1,14 +1,28 @@
 <template>
-  <div class="toast toast-start">
-    <div class="flex flex-col alert alert-info">
-      <span>Nowy post osoby obserwowanej!</span>
-      <p>Odśwież stronę</p>
-    </div>
+  <div v-if="showNotification" class="toast toast-start">
+    <router-link to="/posts">
+      <div class="flex flex-col alert alert-info">
+        <span>Nowy post osoby obserwowanej!</span>
+      </div>
+    </router-link>
   </div>
 </template>
 
 <script>
-export default {};
+import { useUserStore } from "../stores/userStore";
+
+export default {
+  name: "Notification",
+  setup() {
+    const store = useUserStore();
+    return { store };
+  },
+  computed: {
+    showNotification() {
+      return this.store.getShowNotification;
+    },
+  },
+};
 </script>
 
 <style scoped></style>

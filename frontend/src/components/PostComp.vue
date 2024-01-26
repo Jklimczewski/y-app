@@ -170,6 +170,7 @@ export default {
       DataService.addQuote(this.postId, this.quoteContent).then((res) => {
         this.quoteContent = "";
         this.$router.push("/posts/" + res.data.savedQuote._id);
+        this.$refs.modal.close();
       });
     },
   },

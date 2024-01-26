@@ -46,12 +46,14 @@
 <script>
 import { useUserStore } from "../stores/userStore";
 import DataService from "../services/DataService";
+import io from "socket.io-client";
 
 export default {
   name: "Navbar",
   data() {
     return {
       profilePicture: "",
+      socket: null,
     };
   },
   setup() {
@@ -83,6 +85,16 @@ export default {
     },
   },
   created() {
+    this.store.changeShowNotification(false);
+    this.socket = io("https://localhost:3000", { secure: true });
+
+    this.socket.on("postAdded", (data) => {
+      const follows = this.store.getFollows;
+      if (follows.includes(data.message)) {
+        this.store.changeShowNotification(true);
+      }
+    });
+
     if (this.store.getUser) {
       DataService.getData()
         .then((res) => {
