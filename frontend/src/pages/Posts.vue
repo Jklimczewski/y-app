@@ -24,6 +24,17 @@
     </div>
     <div class="card w-full max-w-3xl items-center pt-10">
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe posty</h1>
+      <div class="form-control border-2 border-primary rounded-md mb-2">
+        <label class="label cursor-pointer">
+          <span class="label-text text-md p-2">Tylko nowe ?</span>
+          <input
+            type="checkbox"
+            v-model="onlyUnseen"
+            checked="checked"
+            class="checkbox checkbox-primary"
+          />
+        </label>
+      </div>
       <div v-for="(post, index) in addedPosts" :key="index">
         <PostComp
           :postId="post._id"
@@ -65,6 +76,7 @@ export default {
       postContent: "",
       addedPosts: [],
       fetchedPosts: [],
+      onlyUnseen: false,
     };
   },
   setup() {
@@ -85,19 +97,43 @@ export default {
           }
         });
     },
+    fetchAllData() {
+      DataService.getAllPosts()
+        .then((res) => {
+          this.fetchedPosts = res.data.posts;
+        })
+        .catch((err) => {
+          if (err.response.status && err.response.status == 401) {
+            this.store.deleteUser();
+            location.reload();
+          }
+        });
+    },
+    fetchUnseenData() {
+      DataService.getNewPosts()
+        .then((res) => {
+          this.fetchedPosts = res.data.posts;
+          DataService.postsRefreshed();
+        })
+        .catch((err) => {
+          if (err.response.status && err.response.status == 401) {
+            this.store.deleteUser();
+            location.reload();
+          }
+        });
+    },
+  },
+  watch: {
+    onlyUnseen: function (newVal) {
+      if (newVal == true) {
+        this.fetchUnseenData();
+      } else {
+        this.fetchAllData();
+      }
+    },
   },
   mounted() {
-    DataService.getPosts()
-      .then((res) => {
-        this.fetchedPosts = res.data.posts;
-        DataService.postsRefreshed();
-      })
-      .catch((err) => {
-        if (err.response.status && err.response.status == 401) {
-          this.store.deleteUser();
-          location.reload();
-        }
-      });
+    this.fetchAllData();
   },
 };
 </script>

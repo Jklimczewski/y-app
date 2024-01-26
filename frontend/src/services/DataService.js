@@ -60,8 +60,11 @@ export default {
   fetchPostData(postId) {
     return apiClient.get("/posts/" + postId);
   },
-  getPosts() {
+  getAllPosts() {
     return apiClient.get("/posts/follows");
+  },
+  getNewPosts() {
+    return apiClient.get("/posts/follows/new");
   },
 
   getPersons(pageSize, pageNo) {
