@@ -5,11 +5,12 @@
         class="self-start"
         :postId="postData._id"
         :content="postData.content"
-        :authorId="postData.authorId"
+        :authorId="postData.author"
         :username="postData.username"
         :profilePicture="postData.profilePicture"
         :date="postData.createdAt"
         :parentId="postData.parentPost"
+        :quoteId="postData.quotedPost"
       />
       <h1 class="text-2xl font-semibold items-center">Skomentuj wątek</h1>
       <div class="flex flex-col md:flex-row">
@@ -40,22 +41,24 @@
         <PostComp
           :postId="post._id"
           :content="post.content"
-          :authorId="post.authorId"
+          :authorId="post.author"
           :username="post.username"
           :profilePicture="post.profilePicture"
           :date="post.createdAt"
           :parentId="post.parentPost"
+          :quoteId="post.quotedPost"
         />
       </div>
       <div v-for="(post, index) in fetchedComments" :key="index">
         <PostComp
           :postId="post._id"
           :content="post.content"
-          :authorId="post.authorId"
+          :authorId="post.author"
           :username="post.username"
           :profilePicture="post.profilePicture"
           :date="post.createdAt"
           :parentId="post.parentPost"
+          :quoteId="post.quotedPost"
         />
       </div>
     </div>

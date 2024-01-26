@@ -14,7 +14,6 @@ const isAuthenticated = (req, res, next) => {
 function destructureAuthor(post, authorData) {
   return {
     ...post.toObject(),
-    authorId: authorData._id,
     username: authorData.username,
     profilePicture: authorData.profilePicture,
   };
@@ -28,7 +27,6 @@ async function destructureComments(comments) {
     if (authorData) {
       const updatedComment = {
         ...comment.toObject(),
-        authorId: authorData._id,
         username: authorData.username,
         profilePicture: authorData.profilePicture,
       };
@@ -75,6 +73,27 @@ router.post("/add-comment", isAuthenticated, async (req, res) => {
     if (ifCreated && authorData) {
       const updatedPost = destructureAuthor(ifCreated, authorData);
       res.status(201).json({ savedComment: updatedPost });
+    }
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Dodanie cytatu przez zalogowanego użytkownika
+router.post("/add-quote", isAuthenticated, async (req, res) => {
+  try {
+    const { quoteId, quoteContent } = req.body;
+    const doc = {
+      content: quoteContent,
+      author: req.user.id,
+      parentPost: null,
+      quotedPost: quoteId,
+    };
+    const ifCreated = await Post.create(doc);
+    const authorData = await User.findById(ifCreated.author);
+    if (ifCreated && authorData) {
+      const updatedPost = destructureAuthor(ifCreated, authorData);
+      res.status(201).json({ savedQuote: updatedPost });
     }
   } catch (e) {
     res.status(503).json(e);

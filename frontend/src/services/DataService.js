@@ -48,6 +48,9 @@ export default {
   addComment(parentId, commentContent) {
     return apiClient.post("/posts/add-comment", { parentId, commentContent });
   },
+  addQuote(quoteId, quoteContent) {
+    return apiClient.post("/posts/add-quote", { quoteId, quoteContent });
+  },
   fetchPosts(userId) {
     return apiClient.get("/posts/users/" + userId);
   },

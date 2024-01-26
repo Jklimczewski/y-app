@@ -49,11 +49,12 @@
         <PostComp
           :postId="post._id"
           :content="post.content"
-          :authorId="post.authorId"
+          :authorId="post.author"
           :username="post.username"
           :profilePicture="post.profilePicture"
           :date="post.createdAt"
           :parentId="post.parentPost"
+          :quoteId="post.quotedPost"
         />
       </div>
     </div>
@@ -88,14 +89,17 @@ export default {
       return this.store.getUserId;
     },
   },
+  watch: {
+    "$route.params.userId": function (newUserId) {
+      this.userData = {};
+      this.followed = false;
+      this.userPosts = [];
+      this.fetchData(newUserId);
+      this.fetchUserPosts(newUserId);
+    },
+  },
   created() {
-    DataService.fetchData(this.userId).then((res) => {
-      this.userData = res.data.user;
-    });
-    const follows = this.store.getFollows;
-    if (follows.includes(this.userId)) {
-      this.followed = true;
-    }
+    this.fetchData(this.userId);
   },
   methods: {
     follow() {
@@ -113,11 +117,20 @@ export default {
     toggleShowPosts() {
       this.showPosts = !this.showPosts;
       if (this.showPosts) {
-        this.fetchUserPosts();
+        this.fetchUserPosts(this.userId);
       }
     },
-    fetchUserPosts() {
-      DataService.fetchPosts(this.userId)
+    fetchData(userId) {
+      DataService.fetchData(userId).then((res) => {
+        this.userData = res.data.user;
+      });
+      const follows = this.store.getFollows;
+      if (follows.includes(userId)) {
+        this.followed = true;
+      }
+    },
+    fetchUserPosts(userId) {
+      DataService.fetchPosts(userId)
         .then((res) => {
           this.userPosts = res.data.userPosts;
         })

@@ -38,11 +38,12 @@
         <PostComp
           :postId="post._id"
           :content="post.content"
-          :authorId="post.authorId"
+          :authorId="post.author"
           :username="post.username"
           :profilePicture="post.profilePicture"
           :date="post.createdAt"
           :parentId="post.parentPost"
+          :quoteId="post.quotedPost"
         />
       </div>
     </div>
@@ -74,7 +75,6 @@ export default {
     onSubmit() {
       DataService.addPost(this.postContent)
         .then((res) => {
-          console.log(res.data);
           this.addedPosts.push(res.data.savedPost);
           this.postContent = "";
         })
