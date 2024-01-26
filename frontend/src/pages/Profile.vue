@@ -17,7 +17,7 @@
             class="card-body w-60 h-60 mt-5 ml-14 md:ml-10 md:mt-20 md:mr-10 rounded-full"
           />
           <button
-            class="btn w-80 mr-6 md:mr-0 ml-6 md:ml-0 md:mt-10 text-primary"
+            class="btn border-primary w-80 mr-6 md:mr-0 ml-6 md:ml-0 md:mt-10 text-primary"
             @click="showCard"
           >
             Podgląd wizytówki
