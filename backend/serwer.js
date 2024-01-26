@@ -1,4 +1,6 @@
 const express = require("express");
+const https = require("https");
+const fs = require("fs");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -10,7 +12,7 @@ require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://localhost:5173",
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -33,16 +35,22 @@ const posts = require("./routes/posts");
 app.use("/posts", posts);
 app.use("/users", users);
 
+const key = fs.readFileSync(process.env.KEY_PATH);
+const cert = fs.readFileSync(process.env.CERT_PATH);
+const options = { key: key, cert: cert };
+const httpsServer = https.createServer(options, app);
+
 mongoose
   .connect(`mongodb+srv://${process.env.CREDENTIALS}${process.env.MONGO_URI}`)
   .then((response) => {
     console.log(
       `Connected to MongoDB. Database name: "${response.connections[0].name}"`
     );
+
     const apiPort = process.env.PORT || 3000;
     const apiHost = process.env.API_HOST || "localhost";
-    app.listen(apiPort, () => {
-      console.log(`API server available from: http://${apiHost}:${apiPort}`);
+    httpsServer.listen(apiPort, () => {
+      console.log(`API server available from: https://${apiHost}:${apiPort}`);
     });
   })
   .catch((error) => console.error("Error connecting to MongoDB", error));
