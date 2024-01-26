@@ -48,6 +48,7 @@ router.post("/add-post", isAuthenticated, async (req, res) => {
       quotedPost: null,
     };
     const ifCreated = await Post.create(doc);
+    req.io.emit(`postAdded`, { message: `${req.user.id}` });
     const authorData = await User.findById(ifCreated.author);
     if (ifCreated && authorData) {
       const updatedPost = destructureAuthor(ifCreated, authorData);

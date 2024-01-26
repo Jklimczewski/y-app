@@ -39,7 +39,7 @@
         <PostComp
           :postId="post._id"
           :content="post.content"
-          :authorId="post.authorId"
+          :authorId="post.author"
           :username="post.username"
           :profilePicture="post.profilePicture"
           :date="post.createdAt"
@@ -58,18 +58,22 @@
         />
       </div>
     </div>
+    <Notification v-if="showNotification" />
   </div>
 </template>
 
 <script>
 import PostComp from "../components/PostComp.vue";
+import Notification from "../components/Notification.vue";
 import { useUserStore } from "../stores/userStore";
 import DataService from "../services/DataService";
+import io from "socket.io-client";
 
 export default {
   name: "Posts",
   components: {
     PostComp,
+    Notification,
   },
   data() {
     return {
@@ -77,6 +81,8 @@ export default {
       addedPosts: [],
       fetchedPosts: [],
       onlyUnseen: false,
+      showNotification: false,
+      socket: null,
     };
   },
   setup() {
@@ -88,6 +94,7 @@ export default {
       DataService.addPost(this.postContent)
         .then((res) => {
           this.addedPosts.push(res.data.savedPost);
+          console.log(res.data.savedPost);
           this.postContent = "";
         })
         .catch((err) => {
@@ -133,6 +140,15 @@ export default {
     },
   },
   mounted() {
+    this.socket = io("https://localhost:3000", { secure: true });
+
+    this.socket.on("postAdded", (data) => {
+      const follows = this.store.getFollows;
+      if (follows.includes(data.message)) {
+        this.showNotification = true;
+      }
+    });
+
     this.fetchAllData();
   },
 };

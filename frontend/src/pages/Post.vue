@@ -62,18 +62,22 @@
         />
       </div>
     </div>
+    <Notification v-if="showNotification" />
   </div>
 </template>
 
 <script>
 import PostComp from "../components/PostComp.vue";
+import Notification from "../components/Notification.vue";
 import DataService from "../services/DataService";
 import { useUserStore } from "../stores/userStore";
+import io from "socket.io-client";
 
 export default {
   name: "Post",
   components: {
     PostComp,
+    Notification,
   },
   data() {
     return {
@@ -81,6 +85,8 @@ export default {
       commentContent: "",
       addedComments: [],
       fetchedComments: [],
+      showNotification: false,
+      socket: null,
     };
   },
   props: ["postId"],
@@ -125,6 +131,14 @@ export default {
     },
   },
   created() {
+    this.socket = io("https://localhost:3000", { secure: true });
+    this.socket.on("postAdded", (data) => {
+      const follows = this.store.getFollows;
+      if (follows.includes(data.message)) {
+        this.showNotification = true;
+      }
+    });
+
     this.fetchData(this.postId);
   },
 };

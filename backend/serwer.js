@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const cookie = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
+const socketIo = require("socket.io");
 require("dotenv").config();
 
 app.use(express.urlencoded({ extended: true }));
@@ -30,15 +31,29 @@ app.use(passport.session());
 const initializePassport = require("./passport-config");
 initializePassport(passport);
 
-const users = require("./routes/users");
-const posts = require("./routes/posts");
-app.use("/posts", posts);
-app.use("/users", users);
-
 const key = fs.readFileSync(process.env.KEY_PATH);
 const cert = fs.readFileSync(process.env.CERT_PATH);
 const options = { key: key, cert: cert };
 const httpsServer = https.createServer(options, app);
+const io = socketIo(httpsServer, {
+  cors: {
+    origin: "https://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+const initializeChat = require("./socket-config");
+initializeChat(io);
+
+app.use((req, res, next) => {
+  // Attach io to the request object to make it accessible in routes
+  req.io = io;
+  next();
+});
+
+const users = require("./routes/users");
+const posts = require("./routes/posts");
+app.use("/posts", posts);
+app.use("/users", users);
 
 mongoose
   .connect(`mongodb+srv://${process.env.CREDENTIALS}${process.env.MONGO_URI}`)
