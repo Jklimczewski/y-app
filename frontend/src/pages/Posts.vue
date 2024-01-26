@@ -26,16 +26,23 @@
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe posty</h1>
       <div v-for="(post, index) in addedPosts" :key="index">
         <PostComp
+          :postId="post._id"
           :content="post.content"
-          :username="post.author"
+          :authorId="post.authorId"
+          :username="post.username"
+          :profilePicture="post.profilePicture"
           :date="post.createdAt"
         />
       </div>
       <div v-for="(post, index) in fetchedPosts" :key="index">
         <PostComp
+          :postId="post._id"
           :content="post.content"
-          :username="post.author"
+          :authorId="post.authorId"
+          :username="post.username"
+          :profilePicture="post.profilePicture"
           :date="post.createdAt"
+          :parentId="post.parentPost"
         />
       </div>
     </div>
@@ -67,6 +74,7 @@ export default {
     onSubmit() {
       DataService.addPost(this.postContent)
         .then((res) => {
+          console.log(res.data);
           this.addedPosts.push(res.data.savedPost);
           this.postContent = "";
         })

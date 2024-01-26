@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -10,8 +11,36 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
+function destructureAuthor(post, authorData) {
+  return {
+    ...post.toObject(),
+    authorId: authorData._id,
+    username: authorData.username,
+    profilePicture: authorData.profilePicture,
+  };
+}
+
+async function destructureComments(comments) {
+  const updatedComments = [];
+
+  for (const comment of comments) {
+    const authorData = await User.findById(comment.author);
+    if (authorData) {
+      const updatedComment = {
+        ...comment.toObject(),
+        authorId: authorData._id,
+        username: authorData.username,
+        profilePicture: authorData.profilePicture,
+      };
+      updatedComments.push(updatedComment);
+    }
+  }
+
+  return updatedComments;
+}
+
 // Dodanie posta przez zalogowanego użytkownika
-router.post("/addPost", isAuthenticated, async (req, res) => {
+router.post("/add-post", isAuthenticated, async (req, res) => {
   try {
     const { postContent } = req.body;
     const doc = {
@@ -21,9 +50,32 @@ router.post("/addPost", isAuthenticated, async (req, res) => {
       quotedPost: null,
     };
     const ifCreated = await Post.create(doc);
-    ifCreated
-      ? res.status(201).json({ savedPost: ifCreated })
-      : res.sendStatus(500);
+    const authorData = await User.findById(ifCreated.author);
+    if (ifCreated && authorData) {
+      const updatedPost = destructureAuthor(ifCreated, authorData);
+      res.status(201).json({ savedPost: updatedPost });
+    }
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Dodanie komentarza przez zalogowanego użytkownika
+router.post("/add-comment", isAuthenticated, async (req, res) => {
+  try {
+    const { parentId, commentContent } = req.body;
+    const doc = {
+      content: commentContent,
+      author: req.user.id,
+      parentPost: parentId,
+      quotedPost: null,
+    };
+    const ifCreated = await Post.create(doc);
+    const authorData = await User.findById(ifCreated.author);
+    if (ifCreated && authorData) {
+      const updatedPost = destructureAuthor(ifCreated, authorData);
+      res.status(201).json({ savedComment: updatedPost });
+    }
   } catch (e) {
     res.status(503).json(e);
   }
@@ -39,9 +91,12 @@ router.get("/follows", isAuthenticated, async (req, res) => {
       author: { $in: req.user.follows },
       createdAt: { $gte: twentyFourHoursAgo },
     });
-    postsFromFollowedUsers
-      ? res.status(200).json({ posts: postsFromFollowedUsers })
-      : res.sendStatus(500);
+    if (postsFromFollowedUsers) {
+      const updatedPosts = await destructureComments(postsFromFollowedUsers);
+      res.status(200).json({ posts: updatedPosts });
+    } else {
+      res.sendStatus(500);
+    }
   } catch (e) {
     res.status(503).json(e);
   }
@@ -58,19 +113,56 @@ router.get("/follows/new", isAuthenticated, async (req, res) => {
         $gte: lastRefresh,
       },
     });
-    postsFromFollowedUsers
-      ? res.status(200).json({ posts: postsFromFollowedUsers })
-      : res.sendStatus(500);
+    if (postsFromFollowedUsers) {
+      const updatedPosts = await destructureComments(postsFromFollowedUsers);
+      res.status(200).json({ posts: updatedPosts });
+    } else {
+      res.sendStatus(500);
+    }
   } catch (e) {
     res.status(503).json(e);
   }
 });
 
 // Pobranie postów usera
-router.get("/:userId", async (req, res) => {
+router.get("/users/:userId", async (req, res) => {
   try {
     const userPosts = await Post.find({ author: req.params.userId });
-    userPosts ? res.status(200).json({ userPosts }) : res.sendStatus(500);
+    if (userPosts) {
+      const updatedPosts = await destructureComments(userPosts);
+      res.status(200).json({ userPosts: updatedPosts });
+    } else {
+      res.sendStatus(500);
+    }
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Pobranie komentarzy posta o postId
+router.get("/:postId/comments", isAuthenticated, async (req, res) => {
+  try {
+    const comments = await Post.find({ parentPost: req.params.postId });
+    if (comments) {
+      const updatedComments = await destructureComments(comments);
+      res.status(200).json({ comments: updatedComments });
+    } else {
+      res.sendStatus(500);
+    }
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Pobranie danych posta o postId
+router.get("/:postId", isAuthenticated, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    const authorData = await User.findById(post.author);
+    if (post && authorData) {
+      const updatedPost = destructureAuthor(post, authorData);
+      res.status(200).json({ post: updatedPost });
+    }
   } catch (e) {
     res.status(503).json(e);
   }

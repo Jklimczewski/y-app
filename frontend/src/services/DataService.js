@@ -43,10 +43,19 @@ export default {
   },
 
   addPost(postContent) {
-    return apiClient.post("/posts/addPost", { postContent });
+    return apiClient.post("/posts/add-post", { postContent });
+  },
+  addComment(parentId, commentContent) {
+    return apiClient.post("/posts/add-comment", { parentId, commentContent });
   },
   fetchPosts(userId) {
-    return apiClient.get("/posts/" + userId);
+    return apiClient.get("/posts/users/" + userId);
+  },
+  fetchComments(postId) {
+    return apiClient.get("posts/" + postId + "/comments");
+  },
+  fetchPostData(postId) {
+    return apiClient.get("/posts/" + postId);
   },
   getPosts() {
     return apiClient.get("/posts/follows");

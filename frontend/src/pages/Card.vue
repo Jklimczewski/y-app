@@ -46,11 +46,14 @@
         Posty użytkownika
       </h1>
       <div v-for="post in userPosts" :key="post._id">
-        <!-- Render post data as needed -->
         <PostComp
+          :postId="post._id"
           :content="post.content"
-          :username="post.author"
+          :authorId="post.authorId"
+          :username="post.username"
+          :profilePicture="post.profilePicture"
           :date="post.createdAt"
+          :parentId="post.parentPost"
         />
       </div>
     </div>

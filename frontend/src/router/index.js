@@ -37,6 +37,15 @@ const routes = [
     },
   },
   {
+    path: "/posts/:postId",
+    component: () => import("../pages/Post.vue"),
+    props: true,
+    beforeEnter: () => {
+      const store = useUserStore();
+      if (store.getUser == "") return "/login";
+    },
+  },
+  {
     path: "/card/:userId",
     name: "Card",
     component: () => import("../pages/Card.vue"),
