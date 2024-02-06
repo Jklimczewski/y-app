@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: `https://localhost:3000`,
+  baseURL: `https://localhost:3000/api`,
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -60,16 +60,12 @@ export default {
   fetchPostData(postId) {
     return apiClient.get("/posts/" + postId);
   },
-  getAllPosts() {
-    return apiClient.get("/posts/follows");
+  getPosts(pageSize, pageNo) {
+    return apiClient.get(
+      "/posts/follows" + "?page=" + pageNo + "&pageSize=" + pageSize
+    );
   },
   getNewPosts() {
     return apiClient.get("/posts/follows/new");
-  },
-
-  getPersons(pageSize, pageNo) {
-    return apiClient.get(
-      "/persons" + "/?_limit=" + pageSize + "&_page=" + pageNo
-    );
   },
 };

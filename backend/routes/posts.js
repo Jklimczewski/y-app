@@ -103,6 +103,10 @@ router.post("/add-quote", isAuthenticated, async (req, res) => {
 
 // Pobranie postów obserwowanych osób z ostatnich 24h
 router.get("/follows", isAuthenticated, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 5;
+  const skip = (page - 1) * pageSize;
+
   try {
     const twentyFourHoursAgo = new Date();
     twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
@@ -110,7 +114,11 @@ router.get("/follows", isAuthenticated, async (req, res) => {
     const postsFromFollowedUsers = await Post.find({
       author: { $in: req.user.follows },
       createdAt: { $gte: twentyFourHoursAgo },
-    });
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize);
+
     if (postsFromFollowedUsers) {
       const updatedPosts = await destructureComments(postsFromFollowedUsers);
       res.status(200).json({ posts: updatedPosts });

@@ -45,18 +45,20 @@
           :date="post.createdAt"
         />
       </div>
-      <div v-for="(post, index) in fetchedPosts" :key="index">
-        <PostComp
-          :postId="post._id"
-          :content="post.content"
-          :authorId="post.author"
-          :username="post.username"
-          :profilePicture="post.profilePicture"
-          :date="post.createdAt"
-          :parentId="post.parentPost"
-          :quoteId="post.quotedPost"
-        />
-      </div>
+      <ul id="infinite-scroll">
+        <li v-for="(post, index) in fetchedPosts" :key="index">
+          <PostComp
+            :postId="post._id"
+            :content="post.content"
+            :authorId="post.author"
+            :username="post.username"
+            :profilePicture="post.profilePicture"
+            :date="post.createdAt"
+            :parentId="post.parentPost"
+            :quoteId="post.quotedPost"
+          />
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -73,6 +75,8 @@ export default {
   },
   data() {
     return {
+      pageSize: 4,
+      page: 1,
       postContent: "",
       addedPosts: [],
       fetchedPosts: [],
@@ -98,9 +102,10 @@ export default {
         });
     },
     fetchAllData() {
-      DataService.getAllPosts()
+      DataService.getPosts(this.pageSize, this.page)
         .then((res) => {
-          this.fetchedPosts = res.data.posts;
+          console.log(res.data.posts);
+          this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
         })
         .catch((err) => {
           if (err.response.status && err.response.status == 401) {
@@ -122,6 +127,17 @@ export default {
           }
         });
     },
+    getNextPage() {
+      window.onscroll = () => {
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight;
+
+        if (bottomOfWindow) {
+          this.page += 1;
+        }
+      };
+    },
   },
   watch: {
     onlyUnseen: function (newVal) {
@@ -132,10 +148,16 @@ export default {
         this.fetchAllData();
       }
     },
+    page: {
+      immediate: true,
+      handler(val) {
+        this.fetchAllData();
+      },
+    },
   },
   mounted() {
     this.store.changeShowNotification(false);
-    this.fetchAllData();
+    this.getNextPage();
   },
 };
 </script>
