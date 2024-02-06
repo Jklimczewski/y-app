@@ -104,7 +104,6 @@ export default {
     fetchAllData() {
       DataService.getPosts(this.pageSize, this.page)
         .then((res) => {
-          console.log(res.data.posts);
           this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
         })
         .catch((err) => {
@@ -145,13 +144,15 @@ export default {
       if (newVal == true) {
         this.fetchUnseenData();
       } else {
-        this.fetchAllData();
+        this.page = 1;
       }
     },
     page: {
       immediate: true,
       handler(val) {
-        this.fetchAllData();
+        if (this.onlyUnseen == false) {
+          this.fetchAllData();
+        }
       },
     },
   },
