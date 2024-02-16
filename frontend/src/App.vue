@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar />
-    <Notification />
+    <Notification class="z-40" />
     <router-view></router-view>
   </div>
 </template>

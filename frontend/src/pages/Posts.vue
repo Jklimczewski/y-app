@@ -16,14 +16,14 @@
               required
             ></textarea>
             <div class="flex justify-end mt-6">
-              <button type="submit" class="btn btn-primary">Dodaj post</button>
+              <button type="submit" class="btn btn-primary">Dodaj wpis</button>
             </div>
           </div>
         </form>
       </div>
     </div>
     <div class="card w-full max-w-3xl items-center pt-10">
-      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe posty</h1>
+      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe wpisy</h1>
       <div class="form-control border-2 border-primary rounded-md mb-2">
         <label class="label cursor-pointer">
           <span class="label-text text-md p-2">Tylko nowe ?</span>
@@ -95,7 +95,7 @@ export default {
           this.postContent = "";
         })
         .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
+          if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }
@@ -107,7 +107,7 @@ export default {
           this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
         })
         .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
+          if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }
@@ -120,7 +120,7 @@ export default {
           DataService.postsRefreshed();
         })
         .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
+          if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }

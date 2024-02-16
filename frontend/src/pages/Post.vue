@@ -12,7 +12,7 @@
         :parentId="postData.parentPost"
         :quoteId="postData.quotedPost"
       />
-      <h1 class="text-2xl font-semibold items-center">Skomentuj wątek</h1>
+      <h1 class="text-2xl font-semibold items-center">Skomentuj wpis</h1>
       <div class="flex flex-col md:flex-row">
         <form @submit.prevent="onSubmit" class="card-body p-0">
           <div class="form-control">
@@ -67,7 +67,6 @@
 
 <script>
 import PostComp from "../components/PostComp.vue";
-import Notification from "../components/Notification.vue";
 import DataService from "../services/DataService";
 import { useUserStore } from "../stores/userStore";
 
@@ -103,7 +102,7 @@ export default {
           this.commentContent = "";
         })
         .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
+          if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }
@@ -118,7 +117,7 @@ export default {
           });
         })
         .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
+          if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
           }

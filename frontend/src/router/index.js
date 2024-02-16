@@ -58,10 +58,4 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to) => {
-//   const store = useUserStore();
-
-//   if (to.meta.requiresAuth && store.username == "") return "/login";
-// });
-
 export default router;

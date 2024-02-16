@@ -19,8 +19,8 @@ const saveProfilePicture = (pic) => {
   return new Promise((resolve, reject) => {
     imagekit.upload(
       {
-        file: pic.buffer, //required
-        fileName: pic.originalname, //required
+        file: pic.buffer,
+        fileName: pic.originalname,
         useUniqueFileName: false,
       },
       function (error, result) {
@@ -153,6 +153,22 @@ router.put("/profile/delete-follow", isAuthenticated, async (req, res) => {
     ifEdited ? res.status(200).send("Saved new values") : res.sendStatus(500);
   } catch (e) {
     res.status(503).json(e);
+  }
+});
+
+// Pobranie użytkowników o username zaczynającym się na
+router.get("/search", isAuthenticated, async (req, res) => {
+  try {
+    const { query } = req.query;
+    const users = await User.find(
+      {
+        username: { $regex: `^${query}`, $options: "i" },
+      },
+      "username profilePicture email"
+    );
+    res.status(200).json(users);
+  } catch (e) {
+    res.status(500).json(e);
   }
 });
 

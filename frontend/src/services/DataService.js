@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: `https://localhost:3000/api`,
+  baseURL: `https://${window.location.hostname}:3000/api`,
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -10,6 +10,9 @@ const apiClient = axios.create({
 });
 
 export default {
+  getUsers(input) {
+    return apiClient.get("/users/search" + "?query=" + input);
+  },
   register(email, username, password) {
     return apiClient.post("/users/register", { email, username, password });
   },

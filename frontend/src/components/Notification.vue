@@ -2,7 +2,7 @@
   <div v-if="showNotification" class="toast toast-start">
     <router-link to="/posts">
       <div class="flex flex-col alert alert-info">
-        <span>Nowy post osoby obserwowanej!</span>
+        <span>Nowy post obserwowanej osoby!</span>
       </div>
     </router-link>
   </div>

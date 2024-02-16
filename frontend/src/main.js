@@ -4,9 +4,14 @@ import App from "./App.vue";
 import { createPinia } from "pinia";
 import router from "./router";
 import { OhVueIcon, addIcons } from "oh-vue-icons";
-import { CoUserFollow, CoUserUnfollow } from "oh-vue-icons/icons";
+import {
+  CoUserFollow,
+  CoUserUnfollow,
+  BiSearch,
+  CoHome,
+} from "oh-vue-icons/icons";
 
-addIcons(CoUserFollow, CoUserUnfollow);
+addIcons(CoUserFollow, CoUserUnfollow, CoHome, BiSearch);
 
 const pinia = createPinia();
 const app = createApp(App);

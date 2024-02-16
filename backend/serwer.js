@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const cookie = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
+const path = require("path");
 const socketIo = require("socket.io");
 require("dotenv").config();
 
@@ -45,15 +46,19 @@ const initializeChat = require("./socket-config");
 initializeChat(io);
 
 app.use((req, res, next) => {
-  // Attach io to the request object to make it accessible in routes
   req.io = io;
   next();
 });
 
 const users = require("./routes/users");
 const posts = require("./routes/posts");
-app.use("/posts", posts);
-app.use("/users", users);
+app.use("/api/posts", posts);
+app.use("/api/users", users);
+
+app.use(express.static(path.join(__dirname, "views")));
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "index.html"));
+});
 
 mongoose
   .connect(`mongodb+srv://${process.env.CREDENTIALS}${process.env.MONGO_URI}`)
@@ -64,7 +69,7 @@ mongoose
 
     const apiPort = process.env.PORT || 3000;
     const apiHost = process.env.API_HOST || "localhost";
-    httpsServer.listen(apiPort, () => {
+    httpsServer.listen(apiPort, apiHost, () => {
       console.log(`API server available from: https://${apiHost}:${apiPort}`);
     });
   })

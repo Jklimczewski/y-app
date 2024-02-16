@@ -29,7 +29,9 @@
             src="../assets/avatar.jpg"
             class="w-10 h-10 rounded-full"
           />
-          <h2 class="pl-2 card-title text-sm font-light">@{{ username }}</h2>
+          <h2 class="pl-2 card-title text-base font-light">
+            {{ username }}
+          </h2>
         </div>
       </router-link>
 
@@ -49,8 +51,8 @@
               src="../assets/avatar.jpg"
               class="w-10 h-10 rounded-full"
             />
-            <h2 class="pl-2 card-title text-sm font-light">
-              @{{ fetchedQuotedPost.username }}
+            <h2 class="pl-2 card-title text-base font-light">
+              {{ fetchedQuotedPost.username }}
             </h2>
           </div>
         </router-link>
@@ -87,8 +89,8 @@
                       src="../assets/avatar.jpg"
                       class="w-10 h-10 rounded-full"
                     />
-                    <h2 class="pl-2 card-title text-sm font-light">
-                      @{{ username }}
+                    <h2 class="pl-2 card-title text-base font-light">
+                      {{ username }}
                     </h2>
                   </div>
                 </router-link>
@@ -109,7 +111,7 @@
                     ></textarea>
                     <div class="flex justify-end mt-6">
                       <button type="submit" class="btn btn-primary">
-                        Dodaj post
+                        Dodaj wpis
                       </button>
                     </div>
                   </div>

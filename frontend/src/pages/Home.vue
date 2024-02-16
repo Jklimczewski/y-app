@@ -5,7 +5,7 @@
         <h1 class="text-5xl font-bold">Witamy w serwisie Y</h1>
         <p class="py-6">
           Po zalogowaniu się będziesz mógł dodawać wpisy, obserwować innych
-          użytkowników oraz oczywiście wchodzić w nimi w interakcję !
+          użytkowników oraz oczywiście wchodzić z nimi w interakcję !
         </p>
         <button @click="letsStart" class="btn btn-primary">Zaczynamy</button>
       </div>
