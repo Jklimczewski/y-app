@@ -9,9 +9,10 @@ import {
   CoUserUnfollow,
   BiSearch,
   CoHome,
+  BiCheckCircle,
 } from "oh-vue-icons/icons";
 
-addIcons(CoUserFollow, CoUserUnfollow, CoHome, BiSearch);
+addIcons(CoUserFollow, CoUserUnfollow, CoHome, BiSearch, BiCheckCircle);
 
 const pinia = createPinia();
 const app = createApp(App);

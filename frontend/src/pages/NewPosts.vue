@@ -23,18 +23,7 @@
       </div>
     </div>
     <div class="card w-full max-w-3xl items-center pt-10">
-      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Nowe wpisy</h1>
-      <div class="form-control border-2 border-primary rounded-md mb-2">
-        <label class="label cursor-pointer">
-          <span class="label-text text-md p-2">Tylko nowe ?</span>
-          <input
-            type="checkbox"
-            v-model="onlyUnseen"
-            checked="checked"
-            class="checkbox checkbox-primary"
-          />
-        </label>
-      </div>
+      <h1 class="text-2xl font-semibold pb-5 pt-5 underline">Nowe wpisy</h1>
       <div v-for="(post, index) in addedPosts" :key="index">
         <PostComp
           :postId="post._id"
@@ -59,6 +48,17 @@
           />
         </li>
       </ul>
+      <div v-if="noMorePosts" class="pb-5">
+        <div
+          class="flex flex-row pt-5 text-lg font-semibold text-neutral-content"
+        >
+          <v-icon name="bi-check-circle" scale="2" />
+          <span class="pt-1">Jesteś na bieżąco</span>
+        </div>
+        <router-link to="/posts/all" class="text-primary font-bold">
+          Wyświetl wszystkie wpisy
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -80,7 +80,7 @@ export default {
       postContent: "",
       addedPosts: [],
       fetchedPosts: [],
-      onlyUnseen: false,
+      noMorePosts: false,
     };
   },
   setup() {
@@ -101,22 +101,13 @@ export default {
           }
         });
     },
-    fetchAllData() {
-      DataService.getPosts(this.pageSize, this.page)
-        .then((res) => {
-          this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
-        })
-        .catch((err) => {
-          if (err.response && err.response.status == 401) {
-            this.store.deleteUser();
-            location.reload();
-          }
-        });
-    },
     fetchUnseenData() {
-      DataService.getNewPosts()
+      DataService.getNewPosts(this.pageSize, this.page)
         .then((res) => {
-          this.fetchedPosts = res.data.posts;
+          if (res.data.posts.length == 0) {
+            this.noMorePosts = true;
+          }
+          this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
           DataService.postsRefreshed();
         })
         .catch((err) => {
@@ -132,27 +123,17 @@ export default {
           document.documentElement.scrollTop + window.innerHeight >=
           document.documentElement.offsetHeight;
 
-        if (bottomOfWindow) {
+        if (bottomOfWindow && !this.noMorePosts) {
           this.page += 1;
         }
       };
     },
   },
   watch: {
-    onlyUnseen: function (newVal) {
-      this.store.changeShowNotification(false);
-      if (newVal == true) {
-        this.fetchUnseenData();
-      } else {
-        this.page = 1;
-      }
-    },
     page: {
       immediate: true,
       handler(val) {
-        if (this.onlyUnseen == false) {
-          this.fetchAllData();
-        }
+        this.fetchUnseenData();
       },
     },
   },

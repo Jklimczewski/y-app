@@ -30,7 +30,15 @@ const routes = [
   },
   {
     path: "/posts",
-    component: () => import("../pages/Posts.vue"),
+    component: () => import("../pages/NewPosts.vue"),
+    beforeEnter: () => {
+      const store = useUserStore();
+      if (store.getUser == "") return "/login";
+    },
+  },
+  {
+    path: "/posts/all",
+    component: () => import("../pages/AllPosts.vue"),
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser == "") return "/login";
