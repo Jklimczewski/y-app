@@ -28,7 +28,7 @@ import { useUserStore } from "../stores/userStore";
 import DataService from "../services/DataService";
 
 export default {
-  name: "Posts",
+  name: "AllPosts",
   components: {
     PostComp,
   },

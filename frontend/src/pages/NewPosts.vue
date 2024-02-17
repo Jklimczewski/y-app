@@ -69,7 +69,7 @@ import { useUserStore } from "../stores/userStore";
 import DataService from "../services/DataService";
 
 export default {
-  name: "Posts",
+  name: "NewPosts",
   components: {
     PostComp,
   },
@@ -91,7 +91,7 @@ export default {
     onSubmit() {
       DataService.addPost(this.postContent)
         .then((res) => {
-          this.addedPosts.push(res.data.savedPost);
+          this.addedPosts.unshift(res.data.savedPost);
           this.postContent = "";
         })
         .catch((err) => {
@@ -106,9 +106,9 @@ export default {
         .then((res) => {
           if (res.data.posts.length == 0) {
             this.noMorePosts = true;
+            DataService.postsRefreshed();
           }
           this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
-          DataService.postsRefreshed();
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {
