@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
@@ -70,6 +71,7 @@ router.post("/add-comment", isAuthenticated, async (req, res) => {
       quotedPost: null,
     };
     const ifCreated = await Post.create(doc);
+    req.io.emit(`postAdded`, { message: `${req.user.id}` });
     const authorData = await User.findById(ifCreated.author);
     if (ifCreated && authorData) {
       const updatedPost = destructureAuthor(ifCreated, authorData);
@@ -91,6 +93,7 @@ router.post("/add-quote", isAuthenticated, async (req, res) => {
       quotedPost: quoteId,
     };
     const ifCreated = await Post.create(doc);
+    req.io.emit(`postAdded`, { message: `${req.user.id}` });
     const authorData = await User.findById(ifCreated.author);
     if (ifCreated && authorData) {
       const updatedPost = destructureAuthor(ifCreated, authorData);
@@ -164,16 +167,18 @@ router.get("/follows/new", isAuthenticated, async (req, res) => {
 // Pobranie postów usera
 router.get("/users/:userId", async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const userPosts = await Post.find({ author: req.params.userId }).sort({
       createdAt: -1,
     });
-
-    if (userPosts) {
-      const updatedPosts = await destructureComments(userPosts);
-      res.status(200).json({ userPosts: updatedPosts });
-    } else {
-      res.sendStatus(500);
+    if (!userPosts) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    const updatedPosts = await destructureComments(userPosts);
+    res.status(200).json({ userPosts: updatedPosts });
   } catch (e) {
     res.status(503).json(e);
   }
@@ -182,16 +187,18 @@ router.get("/users/:userId", async (req, res) => {
 // Pobranie komentarzy posta o postId
 router.get("/:postId/comments", isAuthenticated, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+      return res.status(404).json({ message: "Post not found" });
+    }
     const comments = await Post.find({ parentPost: req.params.postId }).sort({
       createdAt: -1,
     });
-
-    if (comments) {
-      const updatedComments = await destructureComments(comments);
-      res.status(200).json({ comments: updatedComments });
-    } else {
-      res.sendStatus(500);
+    if (!comments) {
+      return res.status(404).json({ message: "Post not found" });
     }
+
+    const updatedComments = await destructureComments(comments);
+    res.status(200).json({ comments: updatedComments });
   } catch (e) {
     res.status(503).json(e);
   }
@@ -200,16 +207,18 @@ router.get("/:postId/comments", isAuthenticated, async (req, res) => {
 // Pobranie cytatów posta o postId
 router.get("/:postId/quotes", isAuthenticated, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+      return res.status(404).json({ message: "Post not found" });
+    }
     const quotes = await Post.find({ quotedPost: req.params.postId }).sort({
       createdAt: -1,
     });
-
-    if (quotes) {
-      const updatedQuotes = await destructureComments(quotes);
-      res.status(200).json({ quotes: updatedQuotes });
-    } else {
-      res.sendStatus(500);
+    if (!quotes) {
+      return res.status(404).json({ message: "Post not found" });
     }
+
+    const updatedQuotes = await destructureComments(quotes);
+    res.status(200).json({ quotes: updatedQuotes });
   } catch (e) {
     res.status(503).json(e);
   }
@@ -218,7 +227,14 @@ router.get("/:postId/quotes", isAuthenticated, async (req, res) => {
 // Pobranie danych posta o postId
 router.get("/:postId", isAuthenticated, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
+      return res.status(404).json({ message: "Post not found" });
+    }
     const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
     const authorData = await User.findById(post.author);
     if (post && authorData) {
       const updatedPost = destructureAuthor(post, authorData);

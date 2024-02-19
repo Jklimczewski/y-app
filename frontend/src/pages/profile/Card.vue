@@ -1,5 +1,10 @@
 <template>
-  <div class="flex flex-col items-center pt-8">
+  <div v-if="errorMessage">
+    <h1 class="p-10 self-center text-3xl font-semibold text-center">
+      404 - {{ errorMessage }}
+    </h1>
+  </div>
+  <div v-else class="flex flex-col items-center pt-8">
     <div class="rounded-xl shadow-xl bg-base-200">
       <div class="flex flex-col sm:flex-row p-10 items-center">
         <img
@@ -81,6 +86,7 @@ export default {
       userPosts: [],
       showPosts: false,
       followed: false,
+      errorMessage: "",
     };
   },
   setup() {
@@ -125,13 +131,21 @@ export default {
       }
     },
     fetchData(userId) {
-      DataService.fetchData(userId).then((res) => {
-        this.userData = res.data.user;
-      });
-      const follows = this.store.getFollows;
-      if (follows.includes(userId)) {
-        this.followed = true;
-      }
+      DataService.fetchData(userId)
+        .then((res) => {
+          this.userData = res.data.user;
+          const follows = this.store.getFollows;
+          if (follows.includes(userId)) {
+            this.followed = true;
+          }
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 404) {
+            this.errorMessage = err.response.data.message;
+          } else {
+            console.log(err);
+          }
+        });
     },
     fetchUserPosts(userId) {
       DataService.fetchPosts(userId)

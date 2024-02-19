@@ -1,5 +1,10 @@
 <template>
-  <div class="flex flex-col items-center pt-8">
+  <div v-if="errorMessage">
+    <h1 class="p-10 self-center text-3xl font-semibold text-center">
+      404 - {{ errorMessage }}
+    </h1>
+  </div>
+  <div v-else class="flex flex-col items-center pt-8">
     <div class="card w-full max-w-3xl items-center shadow-xl bg-base-200">
       <PostComp
         class="self-start"
@@ -81,6 +86,7 @@ export default {
       commentContent: "",
       addedComments: [],
       fetchedComments: [],
+      errorMessage: "",
     };
   },
   props: ["postId"],
@@ -120,6 +126,10 @@ export default {
           if (err.response && err.response.status == 401) {
             this.store.deleteUser();
             location.reload();
+          } else if (err.response && err.response.status == 404) {
+            this.errorMessage = err.response.data.message;
+          } else {
+            console.log(err);
           }
         });
     },

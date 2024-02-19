@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const passport = require("passport");
@@ -175,7 +176,13 @@ router.get("/search", isAuthenticated, async (req, res) => {
 // Pobranie danych użytkownika o podanym userId
 router.get("/:userId", async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const toDisplay = {};
     toDisplay.username = user.username;
     if (user.name != "") {
@@ -190,7 +197,7 @@ router.get("/:userId", async (req, res) => {
     if (user.phoneNumber != "") {
       toDisplay.phoneNumber = user.phoneNumber;
     }
-    if (user) res.status(200).json({ user: toDisplay });
+    res.status(200).json({ user: toDisplay });
   } catch (e) {
     res.status(503).json(e);
   }
