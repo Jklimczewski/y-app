@@ -119,7 +119,6 @@ export default {
       immediate: true,
       handler(val) {
         if (val != "") {
-          console.log("Połącz sock");
           DataService.getData()
             .then((res) => {
               this.profilePicture = res.data.user.profilePicture;

@@ -1,7 +1,13 @@
 <template>
   <div class="flex flex-col items-center pt-8">
     <div class="card w-full max-w-3xl items-center">
-      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">
+      <h1
+        v-if="fetchedPosts.length == 0"
+        class="text-2xl font-semibold pt-5 items-center pb-5"
+      >
+        Brak postów do wyświetlenia
+      </h1>
+      <h1 v-else class="text-2xl font-semibold pt-5 items-center pb-5">
         Wszystkie wpisy z ostatnich 24h
       </h1>
       <ul>
@@ -76,7 +82,6 @@ export default {
     page: {
       immediate: true,
       handler(val) {
-        console.log(val);
         this.fetchAllData();
       },
     },

@@ -23,7 +23,7 @@
       </div>
       <div v-if="loggedUserId" class="flex flex-row justify-center pb-5">
         <button @click="toggleShowPosts" class="btn btn-neutral">
-          {{ showPosts ? "Schowaj wpisy" : "Pokaż wpisy" }}
+          {{ showPosts == true ? "Schowaj wpisy" : "Pokaż wpisy" }}
         </button>
         <div v-if="loggedUserId != userId" class="pl-10">
           <button
@@ -41,7 +41,10 @@
         </div>
       </div>
     </div>
-    <div v-if="showPosts" class="card w-full max-w-3xl items-center pt-10">
+    <div
+      v-if="showPosts == true"
+      class="card w-full max-w-3xl items-center pt-10"
+    >
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">
         Wpisy użytkownika
       </h1>
@@ -92,6 +95,7 @@ export default {
   watch: {
     "$route.params.userId": function (newUserId) {
       this.userData = {};
+      this.showPosts = false;
       this.followed = false;
       this.userPosts = [];
       this.fetchData(newUserId);
