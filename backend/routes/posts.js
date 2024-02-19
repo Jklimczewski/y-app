@@ -130,11 +130,12 @@ router.get("/follows", isAuthenticated, async (req, res) => {
   }
 });
 
-// Pobranie postów obserwowanych osób z ostatnich 24h, których nie widzieliśmy
+// Pobranie postów, obserwowanych osób, których jeszcze nie widzieliśmy
 router.get("/follows/new", isAuthenticated, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 5;
-  const skip = (page - 1) * pageSize;
+  const recentlyAdded = parseInt(req.query.recentlyAdded) || 0;
+  const skip = (page - 1) * pageSize + recentlyAdded;
 
   try {
     const lastRefresh = req.user.lastPostsRefresh;

@@ -34,8 +34,8 @@
           :date="post.createdAt"
         />
       </div>
-      <ul id="infinite-scroll">
-        <li v-for="(post, index) in fetchedPosts" :key="index">
+      <ul>
+        <li v-for="(post, nindex) in fetchedNewPosts" :key="nindex">
           <PostComp
             :postId="post._id"
             :content="post.content"
@@ -75,17 +75,23 @@ export default {
   },
   data() {
     return {
-      pageSize: 4,
+      pageSize: 2,
       page: 1,
+      recentlyAdded: 0,
       postContent: "",
       addedPosts: [],
-      fetchedPosts: [],
+      fetchedNewPosts: [],
       noMorePosts: false,
     };
   },
   setup() {
     const store = useUserStore();
     return { store };
+  },
+  computed: {
+    newPosts() {
+      return this.store.getShowNotification;
+    },
   },
   methods: {
     onSubmit() {
@@ -102,13 +108,28 @@ export default {
         });
     },
     fetchUnseenData() {
-      DataService.getNewPosts(this.pageSize, this.page)
+      DataService.getNewPosts(this.pageSize, this.page, this.recentlyAdded)
         .then((res) => {
           if (res.data.posts.length == 0) {
             this.noMorePosts = true;
             DataService.postsRefreshed();
           }
-          this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
+          this.fetchedNewPosts = this.fetchedNewPosts.concat(res.data.posts);
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 401) {
+            this.store.deleteUser();
+            location.reload();
+          }
+        });
+    },
+    fetchNewUnseenData() {
+      DataService.getNewPosts(1, 1)
+        .then((res) => {
+          if (this.noMorePosts == true) {
+            DataService.postsRefreshed();
+          }
+          this.fetchedNewPosts = res.data.posts.concat(this.fetchedNewPosts);
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {
@@ -135,6 +156,15 @@ export default {
       handler(val) {
         this.fetchUnseenData();
       },
+    },
+    newPosts(val) {
+      if (val == true) {
+        this.recentlyAdded += 1;
+        setTimeout(() => {
+          this.fetchNewUnseenData();
+          this.store.changeShowNotification(false);
+        }, 2000);
+      }
     },
   },
   mounted() {

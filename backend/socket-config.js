@@ -1,9 +1,9 @@
 const initialize = (io) => {
   io.on("connection", (socket) => {
-    console.log("A user connected");
+    console.log("User connected");
 
     socket.on("disconnect", () => {
-      console.log("user disconnected");
+      console.log("User disconnected");
     });
   });
 };

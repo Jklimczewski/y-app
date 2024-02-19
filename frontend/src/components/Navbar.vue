@@ -115,12 +115,23 @@ export default {
     },
   },
   watch: {
-    username(val) {
-      if (val != "") {
-        DataService.getData().then((res) => {
-          this.profilePicture = res.data.user.profilePicture;
-        });
-      }
+    username: {
+      immediate: true,
+      handler(val) {
+        if (val != "") {
+          console.log("Połącz sock");
+          DataService.getData()
+            .then((res) => {
+              this.profilePicture = res.data.user.profilePicture;
+              this.socket = io(`https://${window.location.hostname}:3000`, {
+                secure: true,
+              });
+            })
+            .catch((err) => {
+              this.store.deleteUser();
+            });
+        }
+      },
     },
     usersInput(val) {
       this.fetchedUsers = [];
@@ -137,13 +148,29 @@ export default {
           });
       }
     },
+    socket: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.socket.on("postAdded", (data) => {
+            const follows = this.store.getFollows;
+            if (follows.includes(data.message)) {
+              this.store.changeShowNotification(true);
+            }
+          });
+        }
+      },
+    },
   },
   methods: {
     logout() {
       DataService.logout().then((response) => {
         if (response.status == 200) {
           this.store.deleteUser();
-          location.reload();
+          this.socket.disconnect();
+          this.socket = null;
+          this.profilePicture = "";
+          this.$router.push("/login");
         }
       });
     },
@@ -151,32 +178,6 @@ export default {
       this.$refs.modal.close();
       this.usersInput = "";
     },
-  },
-  created() {
-    this.store.changeShowNotification(false);
-    this.socket = io(`https://${window.location.hostname}:3000`, {
-      secure: true,
-    });
-
-    this.socket.on("postAdded", (data) => {
-      const follows = this.store.getFollows;
-      if (follows.includes(data.message)) {
-        this.store.changeShowNotification(true);
-      }
-    });
-
-    if (this.store.getUser) {
-      DataService.getData()
-        .then((res) => {
-          this.profilePicture = res.data.user.profilePicture;
-        })
-        .catch((err) => {
-          if (err.response.status && err.response.status == 401) {
-            this.store.deleteUser();
-            location.reload();
-          }
-        });
-    }
   },
 };
 </script>

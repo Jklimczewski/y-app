@@ -117,8 +117,8 @@ export default {
         .then((res) => {
           this.successMessage = res.data;
           setTimeout(() => {
-            location.reload();
-          }, 2000);
+            this.$router.go();
+          }, 1000);
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {

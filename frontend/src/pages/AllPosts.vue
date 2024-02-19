@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">
         Wszystkie wpisy z ostatnich 24h
       </h1>
-      <ul id="infinite-scroll">
+      <ul>
         <li v-for="(post, index) in fetchedPosts" :key="index">
           <PostComp
             :postId="post._id"
@@ -76,12 +76,12 @@ export default {
     page: {
       immediate: true,
       handler(val) {
+        console.log(val);
         this.fetchAllData();
       },
     },
   },
   mounted() {
-    this.store.changeShowNotification(false);
     this.getNextPage();
   },
 };

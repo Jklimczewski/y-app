@@ -68,9 +68,15 @@ export default {
       "/posts/follows" + "?page=" + pageNo + "&pageSize=" + pageSize
     );
   },
-  getNewPosts(pageSize, pageNo) {
+  getNewPosts(pageSize, pageNo, recentlyAdded) {
     return apiClient.get(
-      "/posts/follows/new" + "?page=" + pageNo + "&pageSize=" + pageSize
+      "/posts/follows/new" +
+        "?page=" +
+        pageNo +
+        "&pageSize=" +
+        pageSize +
+        "&recentlyAdded=" +
+        recentlyAdded
     );
   },
 };
