@@ -75,7 +75,7 @@ export default {
   },
   data() {
     return {
-      pageSize: 2,
+      pageSize: 4,
       page: 1,
       recentlyAdded: 0,
       postContent: "",
@@ -139,15 +139,17 @@ export default {
         });
     },
     getNextPage() {
-      window.onscroll = () => {
-        let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight >=
-          document.documentElement.offsetHeight;
+      setTimeout(() => {
+        window.onscroll = () => {
+          let bottomOfWindow =
+            document.documentElement.scrollTop + window.innerHeight >=
+            document.documentElement.offsetHeight;
 
-        if (bottomOfWindow && !this.noMorePosts) {
-          this.page += 1;
-        }
-      };
+          if (bottomOfWindow && !this.noMorePosts) {
+            this.page += 1;
+          }
+        };
+      }, 1000);
     },
   },
   watch: {

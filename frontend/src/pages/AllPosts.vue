@@ -67,15 +67,17 @@ export default {
         });
     },
     getNextPage() {
-      window.onscroll = () => {
-        let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight >=
-          document.documentElement.offsetHeight - 1;
+      setTimeout(() => {
+        window.onscroll = () => {
+          let bottomOfWindow =
+            document.documentElement.scrollTop + window.innerHeight >=
+            document.documentElement.offsetHeight - 1;
 
-        if (bottomOfWindow && !this.noMorePosts) {
-          this.page += 1;
-        }
-      };
+          if (bottomOfWindow && !this.noMorePosts) {
+            this.page += 1;
+          }
+        };
+      }, 1000);
     },
   },
   watch: {
