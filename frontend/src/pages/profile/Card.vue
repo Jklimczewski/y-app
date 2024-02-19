@@ -65,9 +65,9 @@
 </template>
 
 <script>
-import PostComp from "../components/PostComp.vue";
-import DataService from "../services/DataService";
-import { useUserStore } from "../stores/userStore";
+import PostComp from "@/components/PostComp.vue";
+import DataService from "@/services/DataService";
+import { useUserStore } from "@/stores/userStore";
 
 export default {
   name: "Card",

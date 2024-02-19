@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../pages/Home.vue";
+import Login from "../pages/Login.vue";
+import Register from "../pages/Register.vue";
+import NotFound from "../pages/NotFound.vue";
 import { useUserStore } from "../stores/userStore";
 
 const routes = [
   { path: "/", component: Home },
   {
     path: "/login",
-    component: () => import("../pages/Login.vue"),
+    component: Login,
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser != "") return "/profile";
@@ -14,7 +17,7 @@ const routes = [
   },
   {
     path: "/register",
-    component: () => import("../pages/Register.vue"),
+    component: Register,
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser != "") return "/profile";
@@ -22,7 +25,7 @@ const routes = [
   },
   {
     path: "/profile",
-    component: () => import("../pages/Profile.vue"),
+    component: () => import("../pages/profile/Profile.vue"),
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser == "") return "/login";
@@ -30,7 +33,7 @@ const routes = [
   },
   {
     path: "/posts",
-    component: () => import("../pages/NewPosts.vue"),
+    component: () => import("../pages/posts/NewPosts.vue"),
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser == "") return "/login";
@@ -38,7 +41,7 @@ const routes = [
   },
   {
     path: "/posts/all",
-    component: () => import("../pages/AllPosts.vue"),
+    component: () => import("../pages/posts/AllPosts.vue"),
     beforeEnter: () => {
       const store = useUserStore();
       if (store.getUser == "") return "/login";
@@ -46,7 +49,7 @@ const routes = [
   },
   {
     path: "/posts/:postId",
-    component: () => import("../pages/Post.vue"),
+    component: () => import("../pages/posts/Post.vue"),
     props: true,
     beforeEnter: () => {
       const store = useUserStore();
@@ -56,8 +59,13 @@ const routes = [
   {
     path: "/card/:userId",
     name: "Card",
-    component: () => import("../pages/Card.vue"),
+    component: () => import("../pages/profile/Card.vue"),
     props: true,
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: NotFound,
   },
 ];
 

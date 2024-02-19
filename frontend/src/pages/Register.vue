@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import DataService from "../services/DataService";
+import DataService from "@/services/DataService";
 
 export default {
   name: "Register",
@@ -82,12 +82,11 @@ export default {
         .then((response) => {
           if (response.status == 200) {
             this.errorMessage = response.data;
-          }
-          if (response.status == 201) {
+          } else if (response.status == 201) {
             this.successMessage = response.data;
             setTimeout(() => {
               this.$router.push("/login");
-            }, 2000);
+            }, 1000);
           }
         })
         .catch((err) => {

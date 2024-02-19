@@ -46,8 +46,8 @@
 </template>
 
 <script>
-import DataService from "../services/DataService";
-import { useUserStore } from "../stores/userStore";
+import DataService from "@/services/DataService";
+import { useUserStore } from "@/stores/userStore";
 
 export default {
   name: "Login",
