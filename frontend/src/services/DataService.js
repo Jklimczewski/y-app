@@ -57,8 +57,10 @@ export default {
   addQuote(quoteId, quoteContent) {
     return apiClient.post("/posts/add-quote", { quoteId, quoteContent });
   },
-  fetchPosts(userId) {
-    return apiClient.get("/posts/users/" + userId);
+  fetchPosts(userId, pageSize, pageNo) {
+    return apiClient.get(
+      "/posts/users/" + userId + "?page=" + pageNo + "&pageSize=" + pageSize
+    );
   },
   fetchComments(postId) {
     return apiClient.get("posts/" + postId + "/comments");

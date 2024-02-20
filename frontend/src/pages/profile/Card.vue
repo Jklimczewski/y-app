@@ -128,6 +128,9 @@ export default {
     return {
       userData: {},
       fetchedPosts: null,
+      pageSize: 4,
+      page: 0,
+      noMorePosts: false,
       fetchedFollows: null,
       showPosts: false,
       showFollows: false,
@@ -143,20 +146,6 @@ export default {
     loggedUserId() {
       return this.store.getUserId;
     },
-  },
-  watch: {
-    "$route.params.userId": function (newUserId) {
-      this.userData = {};
-      this.showPosts = false;
-      this.showFollows = false;
-      this.followed = false;
-      this.fetchedPosts = null;
-      this.fetchedFollows = null;
-      this.fetchData(newUserId);
-    },
-  },
-  created() {
-    this.fetchData(this.userId);
   },
   methods: {
     follow() {
@@ -175,7 +164,7 @@ export default {
       this.showPosts = !this.showPosts;
       this.showFollows = false;
       if (this.showPosts && this.fetchedPosts == null) {
-        this.fetchUserPosts(this.userId);
+        this.page += 1;
       }
     },
     toggleShowFollows() {
@@ -204,9 +193,15 @@ export default {
         });
     },
     fetchUserPosts(userId) {
-      DataService.fetchPosts(userId)
+      DataService.fetchPosts(userId, this.pageSize, this.page)
         .then((res) => {
-          this.fetchedPosts = res.data.userPosts;
+          if (res.data.userPosts.length == 0) {
+            this.noMorePosts = true;
+          }
+          if (this.fetchedPosts == null) {
+            this.fetchedPosts = [];
+          }
+          this.fetchedPosts = this.fetchedPosts.concat(res.data.userPosts);
         })
         .catch((err) => {
           if (err.response && err.response.status == 404) {
@@ -229,6 +224,40 @@ export default {
           }
         });
     },
+
+    getNextPage() {
+      window.onscroll = () => {
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight - 1;
+
+        if (bottomOfWindow && !this.noMorePosts) {
+          this.page += 1;
+        }
+      };
+    },
+  },
+  watch: {
+    "$route.params.userId": function (newUserId) {
+      this.userData = {};
+      this.showPosts = false;
+      this.showFollows = false;
+      this.followed = false;
+      this.fetchedPosts = null;
+      this.fetchedFollows = null;
+      this.fetchData(newUserId);
+      this.page = 0;
+      this.noMorePosts = false;
+    },
+    page(val) {
+      if (val > 0) {
+        this.fetchUserPosts(this.userId);
+        this.getNextPage();
+      }
+    },
+  },
+  mounted() {
+    this.fetchData(this.userId);
   },
 };
 </script>

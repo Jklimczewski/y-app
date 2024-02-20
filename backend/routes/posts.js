@@ -165,14 +165,20 @@ router.get("/follows/new", isAuthenticated, async (req, res) => {
 });
 
 // Pobranie postów usera
-router.get("/users/:userId", async (req, res) => {
+router.get("/users/:userId", isAuthenticated, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 5;
+  const skip = (page - 1) * pageSize;
+
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
       return res.status(404).json({ message: "User not found" });
     }
-    const userPosts = await Post.find({ author: req.params.userId }).sort({
-      createdAt: -1,
-    });
+    const userPosts = await Post.find({ author: req.params.userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize);
+
     if (!userPosts) {
       return res.status(404).json({ message: "User not found" });
     }
