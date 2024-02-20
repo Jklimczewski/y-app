@@ -84,6 +84,21 @@ router.get("/profile", isAuthenticated, (req, res) => {
   res.status(200).json({ user: req.user });
 });
 
+// Pobranie danych obserwowanych zalogowanego uzytkownika
+router.get("/profile/follows", isAuthenticated, async (req, res) => {
+  try {
+    const users = await User.find(
+      {
+        _id: { $in: req.user.follows },
+      },
+      "username profilePicture email"
+    );
+    res.status(200).json(users);
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
 // Zmiana danych zalogowanego użytkownika
 router.put(
   "/profile",
@@ -169,7 +184,7 @@ router.get("/search", isAuthenticated, async (req, res) => {
     );
     res.status(200).json(users);
   } catch (e) {
-    res.status(500).json(e);
+    res.status(503).json(e);
   }
 });
 

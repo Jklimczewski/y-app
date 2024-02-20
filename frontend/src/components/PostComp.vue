@@ -26,7 +26,7 @@
           />
           <img
             v-else
-            src="../assets/avatar.jpg"
+            src="@/assets/avatar.jpg"
             class="w-10 h-10 rounded-full"
           />
           <h2 class="pl-2 card-title text-base font-light">
@@ -48,7 +48,7 @@
             />
             <img
               v-else
-              src="../assets/avatar.jpg"
+              src="@/assets/avatar.jpg"
               class="w-10 h-10 rounded-full"
             />
             <h2 class="pl-2 card-title text-base font-light">
@@ -86,7 +86,7 @@
                     />
                     <img
                       v-else
-                      src="../assets/avatar.jpg"
+                      src="@/assets/avatar.jpg"
                       class="w-10 h-10 rounded-full"
                     />
                     <h2 class="pl-2 card-title text-base font-light">
@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import DataService from "../services/DataService";
+import DataService from "@/services/DataService";
 
 export default {
   name: "PostComp",

@@ -176,7 +176,6 @@ router.get("/users/:userId", async (req, res) => {
     if (!userPosts) {
       return res.status(404).json({ message: "User not found" });
     }
-
     const updatedPosts = await destructureComments(userPosts);
     res.status(200).json({ userPosts: updatedPosts });
   } catch (e) {

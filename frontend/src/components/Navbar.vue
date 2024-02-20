@@ -44,7 +44,7 @@
                       />
                       <img
                         v-else
-                        src="../assets/avatar.jpg"
+                        src="@/assets/avatar.jpg"
                         class="w-10 h-10 rounded-full"
                       />
                       <span class="pl-2 card-title text-2xl font-normal">
@@ -71,7 +71,7 @@
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
             <img v-if="profilePicture" :src="profilePicture" />
-            <img v-else src="../assets/avatar.jpg" />
+            <img v-else src="@/assets/avatar.jpg" />
           </div>
         </div>
         <ul
@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import { useUserStore } from "../stores/userStore";
-import DataService from "../services/DataService";
+import { useUserStore } from "@/stores/userStore";
+import DataService from "@/services/DataService";
 import io from "socket.io-client";
 
 export default {

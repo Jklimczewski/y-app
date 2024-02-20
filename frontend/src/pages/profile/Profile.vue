@@ -13,7 +13,7 @@
           />
           <img
             v-else
-            src="../assets/avatar.jpg"
+            src="@/assets/avatar.jpg"
             class="card-body w-60 h-60 mt-5 ml-14 md:ml-10 md:mt-20 md:mr-10 rounded-full"
           />
           <button

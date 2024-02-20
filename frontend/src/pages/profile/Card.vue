@@ -12,7 +12,7 @@
           :src="userData.profilePicture"
           class="w-40 h-40 rounded-full"
         />
-        <img v-else src="../assets/avatar.jpg" class="w-40 h-40 rounded-full" />
+        <img v-else src="@/assets/avatar.jpg" class="w-40 h-40 rounded-full" />
         <div class="flex flex-col lg:flex-row items-center">
           <span class="p-5 text-4xl font-thin">{{ userData.username }} </span>
           <span v-if="userData.name" class="p-2 text-3xl font-small">
@@ -44,6 +44,15 @@
             Obserwuj
           </button>
         </div>
+        <div v-else class="pl-10">
+          <button @click="toggleShowFollows" class="btn btn-neutral">
+            {{
+              showFollows == true
+                ? "Schowaj obserwowane osoby"
+                : "Obserwowane osoby"
+            }}
+          </button>
+        </div>
       </div>
     </div>
     <div
@@ -53,7 +62,7 @@
       <h1 class="text-2xl font-semibold pt-5 items-center pb-5">
         Wpisy użytkownika
       </h1>
-      <div v-for="post in userPosts" :key="post._id">
+      <div v-for="post in fetchedPosts" :key="post._id">
         <PostComp
           :postId="post._id"
           :content="post.content"
@@ -65,6 +74,41 @@
           :quoteId="post.quotedPost"
         />
       </div>
+    </div>
+
+    <div
+      v-else-if="showFollows == true"
+      class="card w-full max-w-3xl items-center pt-10"
+    >
+      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Obserwujesz</h1>
+      <ul>
+        <li v-for="(user, index) in fetchedFollows" :key="index">
+          <div
+            class="card w-96 mb-3 border border-neutral bg-base-100 text-neutral-content"
+          >
+            <router-link :to="'/card/' + user._id">
+              <div class="flex flex-row justify-center space-x-3 p-3">
+                <img
+                  v-if="user.profilePicture"
+                  :src="user.profilePicture"
+                  class="w-10 h-10 rounded-full"
+                />
+                <img
+                  v-else
+                  src="@/assets/avatar.jpg"
+                  class="w-10 h-10 rounded-full"
+                />
+                <span class="pl-2 card-title text-2xl font-normal">
+                  {{ user.username }}
+                </span>
+                <span class="pl-5 card-title text-2xl font-light">
+                  {{ user.email }}
+                </span>
+              </div>
+            </router-link>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -83,8 +127,10 @@ export default {
   data() {
     return {
       userData: {},
-      userPosts: [],
+      fetchedPosts: null,
+      fetchedFollows: null,
       showPosts: false,
+      showFollows: false,
       followed: false,
       errorMessage: "",
     };
@@ -102,10 +148,11 @@ export default {
     "$route.params.userId": function (newUserId) {
       this.userData = {};
       this.showPosts = false;
+      this.showFollows = false;
       this.followed = false;
-      this.userPosts = [];
+      this.fetchedPosts = null;
+      this.fetchedFollows = null;
       this.fetchData(newUserId);
-      this.fetchUserPosts(newUserId);
     },
   },
   created() {
@@ -126,10 +173,19 @@ export default {
     },
     toggleShowPosts() {
       this.showPosts = !this.showPosts;
-      if (this.showPosts) {
+      this.showFollows = false;
+      if (this.showPosts && this.fetchedPosts == null) {
         this.fetchUserPosts(this.userId);
       }
     },
+    toggleShowFollows() {
+      this.showFollows = !this.showFollows;
+      this.showPosts = false;
+      if (this.showFollows && this.fetchedFollows == null) {
+        this.fetchFollowsData();
+      }
+    },
+
     fetchData(userId) {
       DataService.fetchData(userId)
         .then((res) => {
@@ -150,10 +206,27 @@ export default {
     fetchUserPosts(userId) {
       DataService.fetchPosts(userId)
         .then((res) => {
-          this.userPosts = res.data.userPosts;
+          this.fetchedPosts = res.data.userPosts;
         })
         .catch((err) => {
-          console.log(err);
+          if (err.response && err.response.status == 404) {
+            this.errorMessage = err.response.data.message;
+          } else {
+            console.log(err);
+          }
+        });
+    },
+    fetchFollowsData() {
+      DataService.fetchFollowsData()
+        .then((res) => {
+          this.fetchedFollows = res.data;
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 404) {
+            this.errorMessage = err.response.data.message;
+          } else {
+            console.log(err);
+          }
         });
     },
   },

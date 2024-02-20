@@ -25,6 +25,9 @@ export default {
   fetchData(userId) {
     return apiClient.get("/users/" + userId);
   },
+  fetchFollowsData() {
+    return apiClient.get("/users/profile/follows");
+  },
   getData() {
     return apiClient.get("/users/profile");
   },
