@@ -165,6 +165,7 @@ export default {
       this.showFollows = false;
       if (this.showPosts && this.fetchedPosts == null) {
         this.page += 1;
+        this.getNextPage();
       }
     },
     toggleShowFollows() {
@@ -252,7 +253,6 @@ export default {
     page(val) {
       if (val > 0) {
         this.fetchUserPosts(this.userId);
-        this.getNextPage();
       }
     },
   },
