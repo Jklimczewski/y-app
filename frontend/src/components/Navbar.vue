@@ -119,16 +119,23 @@ export default {
       immediate: true,
       handler(val) {
         if (val != "") {
-          DataService.getData()
-            .then((res) => {
-              this.profilePicture = res.data.user.profilePicture;
-              this.socket = io(`https://${window.location.hostname}:3000`, {
-                secure: true,
+          this.socket = io(`https://${window.location.hostname}:3000`, {
+            secure: true,
+          });
+          if (this.store.getProfilePicture) {
+            this.profilePicture = this.store.getProfilePicture;
+          } else {
+            DataService.getData()
+              .then((res) => {
+                this.profilePicture = res.data.user.profilePicture;
+              })
+              .catch((err) => {
+                if (err.response && err.response.status == 401) {
+                  this.store.deleteUser();
+                  location.reload();
+                }
               });
-            })
-            .catch((err) => {
-              this.store.deleteUser();
-            });
+          }
         }
       },
     },

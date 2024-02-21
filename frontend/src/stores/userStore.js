@@ -8,6 +8,11 @@ export const useUserStore = defineStore("user", {
       userId: useLocalStorage("userId", ""),
       userFollows: useLocalStorage("userFollows", []),
       showNotification: false,
+      profilePicture: "",
+      name: "",
+      surname: "",
+      phoneNumber: "",
+      email: "",
     };
   },
   getters: {
@@ -15,11 +20,30 @@ export const useUserStore = defineStore("user", {
     getUserId: (state) => state.userId,
     getFollows: (state) => state.userFollows,
     getShowNotification: (state) => state.showNotification,
+    getProfilePicture: (state) => state.profilePicture,
+    getName: (state) => state.name,
+    getSurname: (state) => state.surname,
+    getPhoneNumber: (state) => state.phoneNumber,
+    getEmail: (state) => state.email,
   },
   actions: {
-    saveUser(userId, username, following) {
+    saveUser(
+      userId,
+      username,
+      following,
+      profilePicture,
+      name,
+      surname,
+      phoneNumber,
+      email
+    ) {
       this.username = username;
       this.userId = userId;
+      this.profilePicture = profilePicture;
+      this.name = name;
+      this.surname = surname;
+      this.phoneNumber = phoneNumber;
+      this.email = email;
       following.forEach((element) => {
         this.userFollows.push(element);
       });
@@ -37,6 +61,11 @@ export const useUserStore = defineStore("user", {
     deleteUser() {
       this.username = "";
       this.userId = "";
+      this.profilePicture = "";
+      this.name = "";
+      this.surname = "";
+      this.phoneNumber = "";
+      this.email = "";
       this.userFollows = [];
       this.showNotification = false;
     },

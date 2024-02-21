@@ -70,7 +70,12 @@ export default {
             this.store.saveUser(
               response.data.user._id,
               response.data.user.username,
-              response.data.user.follows
+              response.data.user.follows,
+              response.data.user.profilePicture,
+              response.data.user.name,
+              response.data.user.surname,
+              response.data.user.phoneNumber,
+              response.data.user.email
             );
             this.$router.push("/profile");
           }
