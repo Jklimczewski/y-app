@@ -66,7 +66,8 @@ router.post("/register", async (req, res) => {
 
 // Login użytkownika
 router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json({ user: req.user });
+  const { password, lastPostsRefresh, ...values } = req.user._doc;
+  res.status(200).json({ user: values });
 });
 
 // Logout użytkownika
@@ -81,7 +82,8 @@ router.post("/logout", function (req, res, next) {
 
 // Pobranie danych zalogowanego użytkownika
 router.get("/profile", isAuthenticated, (req, res) => {
-  res.status(200).json({ user: req.user });
+  const { password, lastPostsRefresh, ...values } = req.user._doc;
+  res.status(200).json({ user: values });
 });
 
 // Pobranie danych obserwowanych zalogowanego uzytkownika

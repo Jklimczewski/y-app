@@ -16,6 +16,7 @@
             placeholder="email"
             class="input input-bordered"
             required
+            autocomplete="off"
           />
         </div>
         <div class="form-control">
@@ -29,6 +30,7 @@
             placeholder="username"
             class="input input-bordered"
             required
+            autocomplete="off"
           />
         </div>
         <div class="form-control">
@@ -42,6 +44,7 @@
             placeholder="password"
             class="input input-bordered"
             required
+            autocomplete="off"
           />
         </div>
         <div class="form-control h-3 text-lg">

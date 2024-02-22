@@ -55,9 +55,9 @@ const posts = require("./routes/posts");
 app.use("/api/posts", posts);
 app.use("/api/users", users);
 
-app.use(express.static(path.join(__dirname, "views")));
+app.use(express.static(path.join(__dirname, "views/dist")));
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "index.html"));
+  res.sendFile(path.join(__dirname, "views/dist", "index.html"));
 });
 
 mongoose

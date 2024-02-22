@@ -57,6 +57,9 @@ export default {
           if (res.data.posts.length == 0) {
             this.noMorePosts = true;
           }
+          if (this.page == 1) {
+            this.getNextPage();
+          }
           this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
         })
         .catch((err) => {
@@ -67,17 +70,15 @@ export default {
         });
     },
     getNextPage() {
-      setTimeout(() => {
-        window.onscroll = () => {
-          let bottomOfWindow =
-            document.documentElement.scrollTop + window.innerHeight >=
-            document.documentElement.offsetHeight - 1;
+      window.onscroll = () => {
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight - 1;
 
-          if (bottomOfWindow && !this.noMorePosts) {
-            this.page += 1;
-          }
-        };
-      }, 1000);
+        if (bottomOfWindow && !this.noMorePosts) {
+          this.page += 1;
+        }
+      };
     },
   },
   watch: {
@@ -87,9 +88,6 @@ export default {
         this.fetchAllData();
       },
     },
-  },
-  mounted() {
-    this.getNextPage();
   },
 };
 </script>

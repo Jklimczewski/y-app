@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center pt-8">
+  <div class="flex flex-col items-center pt-10">
     <div class="card w-full max-w-3xl items-center shadow-xl bg-base-200">
       <h1 class="text-2xl font-semibold pt-5 items-center">Utwórz wątek</h1>
       <div class="flex flex-col md:flex-row">
@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="card w-full max-w-3xl items-center pt-10">
-      <h1 class="text-2xl font-semibold pb-5 pt-5 underline">Nowe wpisy</h1>
+      <h1 class="text-2xl font-semibold pb-8 pt-5 underline">Nowe wpisy</h1>
       <div v-for="(post, index) in addedPosts" :key="index">
         <PostComp
           :postId="post._id"
@@ -114,6 +114,9 @@ export default {
             this.noMorePosts = true;
             DataService.postsRefreshed();
           }
+          if (this.page == 1) {
+            this.getNextPage();
+          }
           this.fetchedNewPosts = this.fetchedNewPosts.concat(res.data.posts);
         })
         .catch((err) => {
@@ -139,17 +142,15 @@ export default {
         });
     },
     getNextPage() {
-      setTimeout(() => {
-        window.onscroll = () => {
-          let bottomOfWindow =
-            document.documentElement.scrollTop + window.innerHeight >=
-            document.documentElement.offsetHeight;
+      window.onscroll = () => {
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight - 1;
 
-          if (bottomOfWindow && !this.noMorePosts) {
-            this.page += 1;
-          }
-        };
-      }, 1000);
+        if (bottomOfWindow && !this.noMorePosts) {
+          this.page += 1;
+        }
+      };
     },
   },
   watch: {
@@ -171,7 +172,6 @@ export default {
   },
   mounted() {
     this.store.changeShowNotification(false);
-    this.getNextPage();
   },
 };
 </script>

@@ -23,7 +23,7 @@
             Podgląd wizytówki
           </button>
         </div>
-        <form @submit.prevent="onSubmit" class="card-body pt-0 md:pt-10">
+        <form @submit.prevent="onSubmit" class="card-body pt-0 md:pt-5">
           <div class="form-control">
             <label for="name" class="label">
               <span class="label-text">Imię</span>
@@ -33,6 +33,7 @@
               type="text"
               id="name"
               class="input input-bordered"
+              autocomplete="off"
             />
           </div>
           <div class="form-control">
@@ -44,6 +45,7 @@
               type="text"
               id="surname"
               class="input input-bordered"
+              autocomplete="off"
             />
           </div>
           <div class="form-control">
@@ -56,6 +58,7 @@
               pattern="[0-9]{9}"
               id="phoneNumber"
               class="input input-bordered"
+              autocomplete="off"
             />
           </div>
           <div class="form-control">
