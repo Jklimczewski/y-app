@@ -54,7 +54,10 @@ export default {
     fetchAllData() {
       DataService.getPosts(this.pageSize, this.page)
         .then((res) => {
-          if (res.data.posts.length == 0) {
+          if (
+            res.data.posts.length == 0 ||
+            res.data.posts.length < this.pageSize
+          ) {
             this.removeNextPageOnScroll();
             this.noMorePosts = true;
           }

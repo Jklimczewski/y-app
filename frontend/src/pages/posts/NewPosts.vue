@@ -112,7 +112,10 @@ export default {
     fetchUnseenData() {
       DataService.getNewPosts(this.pageSize, this.page, this.recentlyAdded)
         .then((res) => {
-          if (res.data.posts.length == 0) {
+          if (
+            res.data.posts.length == 0 ||
+            res.data.posts.length < this.pageSize
+          ) {
             this.removeNextPageOnScroll();
             this.noMorePosts = true;
             DataService.postsRefreshed();

@@ -201,7 +201,10 @@ export default {
     fetchUserPosts(userId) {
       DataService.fetchPosts(userId, this.pageSize, this.page)
         .then((res) => {
-          if (res.data.userPosts.length == 0) {
+          if (
+            res.data.userPosts.length == 0 ||
+            res.data.userPosts.length < this.pageSize
+          ) {
             this.noMorePosts = true;
             this.removeNextPageOnScroll();
           }

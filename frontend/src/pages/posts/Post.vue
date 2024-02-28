@@ -147,7 +147,10 @@ export default {
     fetchComments(postId) {
       DataService.fetchComments(postId, this.pageSize, this.page)
         .then((res) => {
-          if (res.data.comments.length == 0) {
+          if (
+            res.data.comments.length == 0 ||
+            res.data.comments.length < this.pageSize
+          ) {
             this.removeNextPageOnScroll();
             this.noMorePosts = true;
           }
