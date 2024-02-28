@@ -133,7 +133,7 @@ router.get("/follows", isAuthenticated, async (req, res) => {
   }
 });
 
-// Pobranie postów, obserwowanych osób, których jeszcze nie widzieliśmy
+// Pobranie postów, obserwowanych osób, których jeszcze nie widzieliśmy, z ostatnich 48h
 router.get("/follows/new", isAuthenticated, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 5;
@@ -142,12 +142,15 @@ router.get("/follows/new", isAuthenticated, async (req, res) => {
 
   try {
     const lastRefresh = req.user.lastPostsRefresh;
+    const fortyEightHoursAgo = new Date();
+    fortyEightHoursAgo.setDate(fortyEightHoursAgo.getDate() - 2);
 
     const postsFromFollowedUsers = await Post.find({
       author: { $in: req.user.follows },
-      createdAt: {
-        $gte: lastRefresh,
-      },
+      $and: [
+        { createdAt: { $gte: lastRefresh } },
+        { createdAt: { $gte: fortyEightHoursAgo } },
+      ],
     })
       .sort({ createdAt: -1 })
       .skip(skip)

@@ -50,7 +50,7 @@ router.post("/register", async (req, res) => {
       phoneNumber: "",
       profilePicture: "",
       follows: [],
-      lastPostsRefresh: null,
+      lastPostsRefresh: new Date(0),
     };
     const ifExist = await User.findOne({ email: email });
     if (ifExist) {
