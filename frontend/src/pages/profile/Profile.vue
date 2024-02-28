@@ -121,12 +121,14 @@ export default {
           this.successMessage = res.data;
           setTimeout(() => {
             this.$router.go();
-          }, 1000);
+          }, 500);
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {
             this.store.deleteUser();
-            location.reload();
+            this.$router.go();
+          } else {
+            console.log(err);
           }
         });
     },
@@ -168,7 +170,9 @@ export default {
         .catch((err) => {
           if (err.response && err.response.status == 401) {
             this.store.deleteUser();
-            location.reload();
+            this.$router.go();
+          } else {
+            console.log(err);
           }
         });
     }

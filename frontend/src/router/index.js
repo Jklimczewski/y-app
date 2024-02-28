@@ -9,6 +9,7 @@ const routes = [
   { path: "/", component: Home },
   {
     path: "/login",
+    name: "Login",
     component: Login,
     beforeEnter: () => {
       const store = useUserStore();
@@ -17,6 +18,7 @@ const routes = [
   },
   {
     path: "/register",
+    name: "Register",
     component: Register,
     beforeEnter: () => {
       const store = useUserStore();
@@ -25,6 +27,7 @@ const routes = [
   },
   {
     path: "/profile",
+    name: "Profile",
     component: () => import("../pages/profile/Profile.vue"),
     beforeEnter: () => {
       const store = useUserStore();
@@ -33,6 +36,7 @@ const routes = [
   },
   {
     path: "/posts",
+    name: "NewPosts",
     component: () => import("../pages/posts/NewPosts.vue"),
     beforeEnter: () => {
       const store = useUserStore();
@@ -41,6 +45,7 @@ const routes = [
   },
   {
     path: "/posts/all",
+    name: "AllPosts",
     component: () => import("../pages/posts/AllPosts.vue"),
     beforeEnter: () => {
       const store = useUserStore();
@@ -49,6 +54,7 @@ const routes = [
   },
   {
     path: "/posts/:postId",
+    name: "Post",
     component: () => import("../pages/posts/Post.vue"),
     props: true,
     beforeEnter: () => {

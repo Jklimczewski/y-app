@@ -110,7 +110,7 @@ export default {
         .catch((err) => {
           if (err.response && err.response.status == 401) {
             this.store.deleteUser();
-            location.reload();
+            this.$router.go();
           }
         });
     },
@@ -125,7 +125,7 @@ export default {
         .catch((err) => {
           if (err.response && err.response.status == 401) {
             this.store.deleteUser();
-            location.reload();
+            this.$router.go();
           } else if (err.response && err.response.status == 404) {
             this.errorMessage = err.response.data.message;
           } else {

@@ -5,7 +5,6 @@ const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookie = require("cookie-parser");
-const session = require("express-session");
 const passport = require("passport");
 const path = require("path");
 const socketIo = require("socket.io");
@@ -13,20 +12,16 @@ require("dotenv").config();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 const corsOptions = {
   origin: "https://localhost:5173",
   credentials: true,
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
-app.use(
-  session({
-    secret: process.env.APP_SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
 app.use(cookie());
+const { sessionMiddleware } = require("./session-config");
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 const initializePassport = require("./passport-config");
@@ -36,6 +31,7 @@ const key = fs.readFileSync(process.env.KEY_PATH);
 const cert = fs.readFileSync(process.env.CERT_PATH);
 const options = { key: key, cert: cert };
 const httpsServer = https.createServer(options, app);
+
 const io = socketIo(httpsServer, {
   cors: {
     origin: "https://localhost:5173",

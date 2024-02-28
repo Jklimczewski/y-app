@@ -14,7 +14,7 @@
         />
         <img v-else src="@/assets/avatar.jpg" class="w-40 h-40 rounded-full" />
         <div class="flex flex-col lg:flex-row items-center">
-          <span class="p-5 text-4xl font-thin">{{ userData.username }} </span>
+          <span class="p-5 text-3xl font-thin">{{ userData.username }} </span>
           <span v-if="userData.name" class="p-2 text-3xl font-small">
             {{ userData.name }}
           </span>
@@ -205,7 +205,10 @@ export default {
           this.fetchedPosts = this.fetchedPosts.concat(res.data.userPosts);
         })
         .catch((err) => {
-          if (err.response && err.response.status == 404) {
+          if (err.response && err.response.status == 401) {
+            this.store.deleteUser();
+            this.$router.go();
+          } else if (err.response && err.response.status == 404) {
             this.errorMessage = err.response.data.message;
           } else {
             console.log(err);
@@ -218,7 +221,10 @@ export default {
           this.fetchedFollows = res.data;
         })
         .catch((err) => {
-          if (err.response && err.response.status == 404) {
+          if (err.response && err.response.status == 401) {
+            this.store.deleteUser();
+            this.$router.go();
+          } else if (err.response && err.response.status == 404) {
             this.errorMessage = err.response.data.message;
           } else {
             console.log(err);
