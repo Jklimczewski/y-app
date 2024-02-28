@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="card w-full max-w-3xl items-center pt-10">
-      <h1 class="text-2xl font-semibold pt-5 items-center pb-5">Komentarze</h1>
+      <h1 class="text-2xl font-semibold items-center pb-5">Komentarze</h1>
       <div v-for="(post, index) in addedComments" :key="index">
         <PostComp
           :postId="post._id"
@@ -86,6 +86,9 @@ export default {
       commentContent: "",
       addedComments: [],
       fetchedComments: [],
+      pageSize: 2,
+      page: 1,
+      noMorePosts: false,
       errorMessage: "",
     };
   },
@@ -96,8 +99,17 @@ export default {
   },
   watch: {
     "$route.params.postId": function (newPostId) {
+      this.removeNextPageOnScroll();
       this.addedComments = [];
+      this.fetchedComments = [];
+      this.page = 1;
+      this.noMorePosts = false;
       this.fetchData(newPostId);
+    },
+    page(val) {
+      if (val > 1) {
+        this.fetchComments(this.postId);
+      }
     },
   },
   methods: {
@@ -114,13 +126,12 @@ export default {
           }
         });
     },
-    fetchData(newPostId) {
-      DataService.fetchPostData(newPostId)
+    fetchData(postId) {
+      DataService.fetchPostData(postId)
         .then((res) => {
           this.postData = res.data.post;
-          DataService.fetchComments(newPostId).then((res) => {
-            this.fetchedComments = res.data.comments;
-          });
+          this.fetchComments(postId);
+          this.nextPageOnScroll();
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {
@@ -133,9 +144,50 @@ export default {
           }
         });
     },
+    fetchComments(postId) {
+      DataService.fetchComments(postId, this.pageSize, this.page)
+        .then((res) => {
+          if (res.data.comments.length == 0) {
+            this.removeNextPageOnScroll();
+            this.noMorePosts = true;
+          }
+          this.fetchedComments = this.fetchedComments.concat(res.data.comments);
+        })
+        .catch((err) => {
+          if (err.response && err.response.status == 401) {
+            this.store.deleteUser();
+            this.$router.go();
+          } else if (err.response && err.response.status == 404) {
+            this.errorMessage = err.response.data.message;
+          } else {
+            console.log(err);
+          }
+        });
+    },
+
+    scrollHandler() {
+      let bottomOfWindow =
+        document.documentElement.scrollTop + window.innerHeight >=
+        document.documentElement.offsetHeight;
+
+      if (bottomOfWindow && !this.noMorePosts) {
+        this.page += 1;
+      }
+    },
+    nextPageOnScroll() {
+      setTimeout(() => {
+        window.addEventListener("scroll", this.scrollHandler);
+      }, 500);
+    },
+    removeNextPageOnScroll() {
+      window.removeEventListener("scroll", this.scrollHandler);
+    },
   },
   created() {
     this.fetchData(this.postId);
+  },
+  unmounted() {
+    this.removeNextPageOnScroll();
   },
 };
 </script>

@@ -194,17 +194,22 @@ router.get("/users/:userId", isAuthenticated, async (req, res) => {
 
 // Pobranie komentarzy posta o postId
 router.get("/:postId/comments", isAuthenticated, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 5;
+  const skip = (page - 1) * pageSize;
+
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
       return res.status(404).json({ message: "Post not found" });
     }
-    const comments = await Post.find({ parentPost: req.params.postId }).sort({
-      createdAt: -1,
-    });
+    const comments = await Post.find({ parentPost: req.params.postId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize);
+
     if (!comments) {
       return res.status(404).json({ message: "Post not found" });
     }
-
     const updatedComments = await destructureComments(comments);
     res.status(200).json({ comments: updatedComments });
   } catch (e) {
@@ -214,17 +219,22 @@ router.get("/:postId/comments", isAuthenticated, async (req, res) => {
 
 // Pobranie cytatów posta o postId
 router.get("/:postId/quotes", isAuthenticated, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 5;
+  const skip = (page - 1) * pageSize;
+
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
       return res.status(404).json({ message: "Post not found" });
     }
-    const quotes = await Post.find({ quotedPost: req.params.postId }).sort({
-      createdAt: -1,
-    });
+    const quotes = await Post.find({ quotedPost: req.params.postId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize);
+
     if (!quotes) {
       return res.status(404).json({ message: "Post not found" });
     }
-
     const updatedQuotes = await destructureComments(quotes);
     res.status(200).json({ quotes: updatedQuotes });
   } catch (e) {

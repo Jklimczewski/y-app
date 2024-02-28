@@ -62,8 +62,16 @@ export default {
       "/posts/users/" + userId + "?page=" + pageNo + "&pageSize=" + pageSize
     );
   },
-  fetchComments(postId) {
-    return apiClient.get("posts/" + postId + "/comments");
+  fetchComments(postId, pageSize, pageNo) {
+    return apiClient.get(
+      "posts/" +
+        postId +
+        "/comments" +
+        "?page=" +
+        pageNo +
+        "&pageSize=" +
+        pageSize
+    );
   },
   fetchPostData(postId) {
     return apiClient.get("/posts/" + postId);

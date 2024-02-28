@@ -55,10 +55,11 @@ export default {
       DataService.getPosts(this.pageSize, this.page)
         .then((res) => {
           if (res.data.posts.length == 0) {
+            this.removeNextPageOnScroll();
             this.noMorePosts = true;
           }
           if (this.page == 1) {
-            this.getNextPage();
+            this.nextPageOnScroll();
           }
           this.fetchedPosts = this.fetchedPosts.concat(res.data.posts);
         })
@@ -71,16 +72,20 @@ export default {
           }
         });
     },
-    getNextPage() {
-      window.onscroll = () => {
-        let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight >=
-          document.documentElement.offsetHeight - 1;
+    scrollHandler() {
+      let bottomOfWindow =
+        document.documentElement.scrollTop + window.innerHeight >=
+        document.documentElement.offsetHeight - 1;
 
-        if (bottomOfWindow && !this.noMorePosts) {
-          this.page += 1;
-        }
-      };
+      if (bottomOfWindow && !this.noMorePosts) {
+        this.page += 1;
+      }
+    },
+    nextPageOnScroll() {
+      window.addEventListener("scroll", this.scrollHandler);
+    },
+    removeNextPageOnScroll() {
+      window.removeEventListener("scroll", this.scrollHandler);
     },
   },
   watch: {
@@ -90,6 +95,9 @@ export default {
         this.fetchAllData();
       },
     },
+  },
+  unmounted() {
+    this.removeNextPageOnScroll();
   },
 };
 </script>

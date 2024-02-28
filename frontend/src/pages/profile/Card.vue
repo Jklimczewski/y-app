@@ -165,12 +165,17 @@ export default {
       this.showFollows = false;
       if (this.showPosts && this.fetchedPosts == null) {
         this.page += 1;
-        this.getNextPage();
+        this.nextPageOnScroll();
+      } else if (this.showPosts) {
+        this.nextPageOnScroll();
+      } else {
+        this.removeNextPageOnScroll();
       }
     },
     toggleShowFollows() {
       this.showFollows = !this.showFollows;
       this.showPosts = false;
+      this.removeNextPageOnScroll();
       if (this.showFollows && this.fetchedFollows == null) {
         this.fetchFollowsData();
       }
@@ -198,6 +203,7 @@ export default {
         .then((res) => {
           if (res.data.userPosts.length == 0) {
             this.noMorePosts = true;
+            this.removeNextPageOnScroll();
           }
           if (this.fetchedPosts == null) {
             this.fetchedPosts = [];
@@ -232,20 +238,25 @@ export default {
         });
     },
 
-    getNextPage() {
-      window.onscroll = () => {
-        let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight >=
-          document.documentElement.offsetHeight - 1;
+    scrollHandler() {
+      let bottomOfWindow =
+        document.documentElement.scrollTop + window.innerHeight >=
+        document.documentElement.offsetHeight - 1;
 
-        if (bottomOfWindow && !this.noMorePosts) {
-          this.page += 1;
-        }
-      };
+      if (bottomOfWindow && !this.noMorePosts) {
+        this.page += 1;
+      }
+    },
+    nextPageOnScroll() {
+      window.addEventListener("scroll", this.scrollHandler);
+    },
+    removeNextPageOnScroll() {
+      window.removeEventListener("scroll", this.scrollHandler);
     },
   },
   watch: {
     "$route.params.userId": function (newUserId) {
+      this.removeNextPageOnScroll();
       this.userData = {};
       this.showPosts = false;
       this.showFollows = false;
@@ -264,6 +275,9 @@ export default {
   },
   created() {
     this.fetchData(this.userId);
+  },
+  unmounted() {
+    this.removeNextPageOnScroll();
   },
 };
 </script>
