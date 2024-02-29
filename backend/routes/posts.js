@@ -133,24 +133,17 @@ router.get("/follows", isAuthenticated, async (req, res) => {
   }
 });
 
-// Pobranie postów, obserwowanych osób, których jeszcze nie widzieliśmy, z ostatnich 48h
+// Pobranie nowo dodanych postów
 router.get("/follows/new", isAuthenticated, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 5;
-  const recentlyAdded = parseInt(req.query.recentlyAdded) || 0;
-  const skip = (page - 1) * pageSize + recentlyAdded;
+  const skip = (page - 1) * pageSize;
 
   try {
     const lastRefresh = req.user.lastPostsRefresh;
-    const fortyEightHoursAgo = new Date();
-    fortyEightHoursAgo.setDate(fortyEightHoursAgo.getDate() - 2);
-
     const postsFromFollowedUsers = await Post.find({
       author: { $in: req.user.follows },
-      $and: [
-        { createdAt: { $gte: lastRefresh } },
-        { createdAt: { $gte: fortyEightHoursAgo } },
-      ],
+      createdAt: { $gte: lastRefresh },
     })
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -161,6 +154,89 @@ router.get("/follows/new", isAuthenticated, async (req, res) => {
       res.status(200).json({ posts: updatedPosts });
     } else {
       res.sendStatus(500);
+    }
+  } catch (e) {
+    res.status(503).json(e);
+  }
+});
+
+// Pobranie postów, obserwowanych osób, których jeszcze nie widzieliśmy, z ostatnich 48h
+router.get("/follows/unseen", isAuthenticated, async (req, res) => {
+  async function isNextPage(
+    skip,
+    recentlyAdded,
+    lastRefresh,
+    fortyEightHoursAgo
+  ) {
+    const nextPagePosts = await Post.find({
+      author: { $in: req.user.follows },
+      $and: [
+        { createdAt: { $gt: lastRefresh } },
+        { createdAt: { $gte: fortyEightHoursAgo } },
+      ],
+    })
+      .sort({ createdAt: 1 })
+      .skip(skip);
+
+    return nextPagePosts.length - recentlyAdded;
+  }
+
+  try {
+    const pageSize = parseInt(req.query.pageSize) || 5;
+    const recentlyAdded = parseInt(req.query.recentlyAdded) || 0;
+    const lastRefresh = req.user.lastPostsRefresh;
+    const fortyEightHoursAgo = new Date();
+    fortyEightHoursAgo.setDate(fortyEightHoursAgo.getDate() - 2);
+
+    const left = await isNextPage(
+      pageSize,
+      recentlyAdded,
+      lastRefresh,
+      fortyEightHoursAgo
+    );
+
+    if (left > 0) {
+      const postsFromFollowedUsers = await Post.find({
+        author: { $in: req.user.follows },
+        $and: [
+          { createdAt: { $gt: lastRefresh } },
+          { createdAt: { $gte: fortyEightHoursAgo } },
+        ],
+      })
+        .sort({ createdAt: 1 })
+        .limit(pageSize);
+
+      if (postsFromFollowedUsers) {
+        const updatedPosts = await destructureComments(postsFromFollowedUsers);
+        await User.updateOne(
+          { _id: req.user.id },
+          { lastPostsRefresh: updatedPosts.at(-1).createdAt }
+        );
+        res.status(200).json({ posts: updatedPosts, next: true });
+      } else {
+        res.sendStatus(500);
+      }
+    } else {
+      const postsFromFollowedUsers = await Post.find({
+        author: { $in: req.user.follows },
+        $and: [
+          { createdAt: { $gt: lastRefresh } },
+          { createdAt: { $gte: fortyEightHoursAgo } },
+        ],
+      })
+        .sort({ createdAt: 1 })
+        .limit(pageSize + left);
+
+      if (postsFromFollowedUsers) {
+        const updatedPosts = await destructureComments(postsFromFollowedUsers);
+        await User.updateOne(
+          { _id: req.user.id },
+          { lastPostsRefresh: new Date() }
+        );
+        res.status(200).json({ posts: updatedPosts, next: false });
+      } else {
+        res.sendStatus(500);
+      }
     }
   } catch (e) {
     res.status(503).json(e);

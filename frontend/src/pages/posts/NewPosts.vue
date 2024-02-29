@@ -75,7 +75,7 @@ export default {
   },
   data() {
     return {
-      pageSize: 4,
+      pageSize: 2,
       page: 1,
       recentlyAdded: 0,
       postContent: "",
@@ -110,15 +110,11 @@ export default {
         });
     },
     fetchUnseenData() {
-      DataService.getNewPosts(this.pageSize, this.page, this.recentlyAdded)
+      DataService.getUnseenPosts(this.pageSize, this.page, this.recentlyAdded)
         .then((res) => {
-          if (
-            res.data.posts.length == 0 ||
-            res.data.posts.length < this.pageSize
-          ) {
+          if (!res.data.next) {
             this.removeNextPageOnScroll();
             this.noMorePosts = true;
-            DataService.postsRefreshed();
           } else if (this.page == 1) {
             this.nextPageOnScroll();
           }
