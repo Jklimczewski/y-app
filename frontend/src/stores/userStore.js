@@ -50,7 +50,10 @@ export const useUserStore = defineStore("user", {
       this.showNotification = false;
     },
     addToFollow(userToFollow) {
-      this.userFollows.push(userToFollow);
+      const index = this.userFollows.indexOf(userToFollow);
+      if (index < 0) {
+        this.userFollows.push(userToFollow);
+      }
     },
     deleteToFollow(userToUnfollow) {
       const index = this.userFollows.indexOf(userToUnfollow);

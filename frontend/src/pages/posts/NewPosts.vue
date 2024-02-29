@@ -140,6 +140,7 @@ export default {
             DataService.postsRefreshed();
           }
           this.fetchedNewPosts = res.data.posts.concat(this.fetchedNewPosts);
+          window.scrollTo({ top: 212, behavior: "smooth" });
         })
         .catch((err) => {
           if (err.response && err.response.status == 401) {
