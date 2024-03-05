@@ -1,12 +1,11 @@
 import { defineStore } from "pinia";
-import { useLocalStorage } from "@vueuse/core";
 
 export const useUserStore = defineStore("user", {
   state: () => {
     return {
-      username: useLocalStorage("username", ""),
-      userId: useLocalStorage("userId", ""),
-      userFollows: useLocalStorage("userFollows", []),
+      username: "",
+      userId: "",
+      userFollows: [],
       showNotification: false,
       profilePicture: "",
       name: "",

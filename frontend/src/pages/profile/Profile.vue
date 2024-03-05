@@ -142,40 +142,11 @@ export default {
     },
   },
   created() {
-    if (this.store.getEmail) {
-      this.userId = this.store.getUserId;
-      this.name = this.store.getName;
-      this.surname = this.store.getSurname;
-      this.phoneNumber = this.store.getPhoneNumber;
-      this.savedPicture = this.store.getProfilePicture;
-    } else {
-      DataService.getData()
-        .then((res) => {
-          this.store.saveUser(
-            res.data.user._id,
-            res.data.user.username,
-            res.data.user.follows,
-            res.data.user.profilePicture,
-            res.data.user.name,
-            res.data.user.surname,
-            res.data.user.phoneNumber,
-            res.data.user.email
-          );
-          this.userId = this.store.getUserId;
-          this.name = this.store.getName;
-          this.surname = this.store.getSurname;
-          this.phoneNumber = this.store.getPhoneNumber;
-          this.savedPicture = this.store.getProfilePicture;
-        })
-        .catch((err) => {
-          if (err.response && err.response.status == 401) {
-            this.store.deleteUser();
-            this.$router.go();
-          } else {
-            console.log(err);
-          }
-        });
-    }
+    this.userId = this.store.getUserId;
+    this.name = this.store.getName;
+    this.surname = this.store.getSurname;
+    this.phoneNumber = this.store.getPhoneNumber;
+    this.savedPicture = this.store.getProfilePicture;
   },
 };
 </script>

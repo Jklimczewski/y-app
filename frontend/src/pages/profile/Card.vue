@@ -26,11 +26,14 @@
           </span>
         </div>
       </div>
-      <div v-if="loggedUserId" class="flex flex-row justify-center pb-5">
+      <div
+        v-if="loggedInUserData.userId"
+        class="flex flex-row justify-center pb-5"
+      >
         <button @click="toggleShowPosts" class="btn btn-neutral">
           {{ showPosts == true ? "Schowaj wpisy" : "Pokaż wpisy" }}
         </button>
-        <div v-if="loggedUserId != userId" class="pl-10">
+        <div v-if="loggedInUserData.userId != userId" class="pl-10">
           <button
             v-if="followed == true"
             @click="unfollow"
@@ -127,6 +130,7 @@ export default {
   data() {
     return {
       userData: {},
+      loggedInUserData: {},
       fetchedPosts: null,
       pageSize: 4,
       page: 0,
@@ -142,21 +146,21 @@ export default {
     const store = useUserStore();
     return { store };
   },
-  computed: {
-    loggedUserId() {
-      return this.store.getUserId;
-    },
-  },
   methods: {
     follow() {
       DataService.addFollow(this.userId).then((res) => {
         this.store.addToFollow(this.userId);
+        this.loggedInUserData.follows.push(this.userId);
         this.followed = true;
       });
     },
     unfollow() {
       DataService.deleteFollow(this.userId).then((res) => {
         this.store.deleteToFollow(this.userId);
+        const index = this.loggedInUserData.follows.indexOf(this.userId);
+        if (index >= 0) {
+          this.loggedInUserData.follows.splice(index, 1);
+        }
         this.followed = false;
       });
     },
@@ -185,8 +189,7 @@ export default {
       DataService.fetchData(userId)
         .then((res) => {
           this.userData = res.data.user;
-          const follows = this.store.getFollows;
-          if (follows.includes(userId)) {
+          if (this.loggedInUserData.follows.includes(userId)) {
             this.followed = true;
           }
         })
@@ -197,6 +200,31 @@ export default {
             console.log(err);
           }
         });
+    },
+    fetchLoggedInUserData() {
+      this.loggedInUserData.follows = [];
+      this.loggedInUserData.userId = "";
+      if (this.store.getEmail) {
+        this.loggedInUserData.follows = this.store.getFollows;
+        this.loggedInUserData.userId = this.store.getUserId;
+      } else {
+        DataService.getData()
+          .then((response) => {
+            this.loggedInUserData.follows = response.data.user.follows;
+            this.loggedInUserData.userId = response.data.user._id;
+            this.store.saveUser(
+              response.data.user._id,
+              response.data.user.username,
+              response.data.user.follows,
+              response.data.user.profilePicture,
+              response.data.user.name,
+              response.data.user.surname,
+              response.data.user.phoneNumber,
+              response.data.user.email
+            );
+          })
+          .catch((err) => err);
+      }
     },
     fetchUserPosts(userId) {
       DataService.fetchPosts(userId, this.pageSize, this.page)
@@ -261,12 +289,14 @@ export default {
     "$route.params.userId": function (newUserId) {
       this.removeNextPageOnScroll();
       this.userData = {};
+      this.loggedInUserData = {};
       this.showPosts = false;
       this.showFollows = false;
       this.followed = false;
       this.fetchedPosts = null;
       this.fetchedFollows = null;
       this.fetchData(newUserId);
+      this.fetchLoggedInUserData();
       this.page = 0;
       this.noMorePosts = false;
     },
@@ -278,6 +308,7 @@ export default {
   },
   created() {
     this.fetchData(this.userId);
+    this.fetchLoggedInUserData();
   },
   unmounted() {
     this.removeNextPageOnScroll();
