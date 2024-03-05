@@ -1,16 +1,16 @@
-# :book: Y-App
+# Y-App
 
 ## :notebook: Description
 
-I've made this project during my last year of studies on course "Web Technologies". That was my first experience with [Vue.js](https://vuejs.org/) and I have to say I really enjoyed it.
+I've made this project during my last year of studies on course `Web Technologies`. That was my first experience with [Vue.js](https://vuejs.org/) and I have to say I really enjoyed it.
 
 ### 🧰 Architecture
 
-- server written in JavaScript, Node.js and connected to MongoDB Database
-- client written in JavaScript, Vue.js with usage of one and only [Pinia Store](https://pinia.vuejs.org/)
-- authorization with [Passport](https://www.passportjs.org/) and Passport-local strategy
+- server written in JavaScript, `Node.js` and connected to `MongoDB Database`
+- client written in JavaScript, `Vue.js` with the usage of one and only [Pinia Store](https://pinia.vuejs.org/)
+- authorization with [Passport](https://www.passportjs.org/) and `Passport-local` strategy
 - connected to [ImageKit](https://imagekit.io/) for working with profile pictures
-- usage of [Socket.io](https://socket.io/) as the WebSockets protocol library to send notification to clients
+- usage of [Socket.io](https://socket.io/) as the `WebSockets` protocol library to send notification to clients
 - CSS styling with the help of [Tailwind](https://tailwindcss.com/)
 
 ## :star: Main features
