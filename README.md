@@ -4,6 +4,9 @@
 
 I've made this project during my last year of studies on course `Web Technologies`. That was my first experience with [Vue.js](https://vuejs.org/) and I have to say I really enjoyed it.
 
+## 🔭 App Preview
+![](https://github.com/Jklimczewski/y-app/blob/main/AppPreview.gif)
+
 ### 🧰 Architecture
 
 - server written in JavaScript, `Node.js` and connected to `MongoDB Database`
