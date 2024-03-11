@@ -1,13 +1,13 @@
 # Y-App
 
-## :notebook: Description
+## 📝 Description
 
 I've made this project during my last year of studies on course `Web Technologies`. That was my first experience with [Vue.js](https://vuejs.org/) and I have to say I really enjoyed it.
 
 ## 🔭 App Preview
 ![](https://github.com/Jklimczewski/y-app/blob/main/AppPreview.gif)
 
-### 🧰 Architecture
+### 🛠️ Architecture
 
 - server written in JavaScript, `Node.js` and connected to `MongoDB Database`
 - client written in JavaScript, `Vue.js` with the usage of one and only [Pinia Store](https://pinia.vuejs.org/)
@@ -16,7 +16,7 @@ I've made this project during my last year of studies on course `Web Technologie
 - usage of [Socket.io](https://socket.io/) as the `WebSockets` protocol library to send notification to clients
 - CSS styling with the help of [Tailwind](https://tailwindcss.com/)
 
-## :star: Main features
+## 🏌️‍♂️ Main features
 
 - user register/login using email and password authentication
 - update profile data and display it as a nice visiting card
